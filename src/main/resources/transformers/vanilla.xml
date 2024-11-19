@@ -1,0 +1,26 @@
+<!--
+  ~ Copyright (c) PORTB 2024
+  ~
+  ~ Licensed under GNU LGPL v3
+  ~ https://www.gnu.org/licenses/lgpl-3.0.txt
+  -->
+
+<transformers>
+    <class path="net.minecraft.world.Container" transformChildren="true">
+        <method name="getMaxStackSize" transformer="slotLimit"/>
+        <method name="m_6893_" transformer="slotLimit"/>
+    </class>
+
+    <class path="net/minecraftforge/items/IItemHandler" transformChildren="true">
+        <method name="getSlotLimit" transformer="slotLimit" desc="(I)I"/>
+        <!--      I don't remember what this does exactly. I think it was to preserve the behaviour of sophisticated stuff's stack upgrade system  -->
+        <blacklist>net/p3pp3rf1y/sophisticatedcore/inventory/InventoryHandler</blacklist>
+    </class>
+
+    <class path="net/minecraft/world/inventory/Slot" transformChildren="true">
+        <method name="getMaxStackSize" transformer="slotLimit" desc="()I"/>
+        <method name="m_6641_" transformer="slotLimit"/>
+        <!--      I don't remember what this does exactly. I think it was to preserve the behaviour of sophisticated stuff's stack upgrade system  -->
+        <blacklist>net/p3pp3rf1y/sophisticatedcore/common/gui/StorageInventorySlot</blacklist>
+    </class>
+</transformers>
