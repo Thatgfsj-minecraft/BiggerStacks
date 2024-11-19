@@ -1,5 +1,3 @@
-import portb.gradle.ChangelogPrompt;
-
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
@@ -9,17 +7,15 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0,6.2)', changing: true
         classpath 'org.parchmentmc:librarian:1.+'
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-        classpath 'portb.gradle:ChangelogPromptHelper:1.0'
     }
 }
 
 plugins {
     id 'eclipse'
     id 'maven-publish'
-    id 'portb.gradle.MinecraftSubmoduleDependencyPlugin' version "1.2"
     id "com.modrinth.minotaur" version "2.+"
 }
 
@@ -38,6 +34,9 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 minecraft {
     mappings channel: 'parchment', version: "$parchmentVersion-$minecraftVersion"
 
+    copyIdeResources = true
+    generateRunFolders = true
+
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -47,6 +46,8 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', 'biggerstacks'
+            property "mixin.env.remapRefMap", "true"
+            property "mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg"
 
             args(["--username", "Dev###"])
 
@@ -113,54 +114,37 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 repositories {
     mavenCentral()
     mavenLocal()
-
+    maven {
+        url = "https://codeberg.org/api/packages/PORTB/maven"
+    }
     maven { // JEI
         name 'DVS1 Maven FS'
         url 'https://dvs1.progwml6.com/files/maven'
     }
-}
-
-//
-// Submodule config
-//
-submodules {
-    submodulesDirectory = file("submodules")
-
-    repos {
-        "Applied-Energistics-2" {
-            //disable tasks that cause errors
-            customGradleCode = """
-                afterEvaluate{
-                    tasks.spotlessJava.enabled = false
-                    tasks.spotlessJavaCheck.enabled = false
-                    tasks.spotlessJson.enabled = false
-                    tasks.test.enabled = false
-                }
-
-            """.stripIndent()
-
-            reobfTaskName = "reobfShadowJar"
-            jarTask = "shadowJar"
-            tasks = ["runData", "build"]
-//            runtime = false
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
         }
-
-        PrettyPipes {
-            forceForgeGradleVersion = "5.1.69"
-//            runtime = false
-        }
-
-        Backpacked {
-            //seems to error at runtime for some reason
-            runtime = false
+        forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
+        filter {
+            includeGroup "maven.modrinth"
         }
     }
-
-    defaultOptions {
-        runtime = true
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        forRepositories(fg.repository)
+        filter {
+            includeGroup "curse.maven"
+        }
     }
 }
-
 
 dependencies {
     minecraft "net.minecraftforge:forge:$minecraftVersion-$forgeVersion"
@@ -185,7 +169,21 @@ dependencies {
     //
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.5.0.297")
+    implementation fg.deobf("maven.modrinth:ae2:forge-12.9.9")
+    implementation fg.deobf("maven.modrinth:modular-routers:1.19.2-10.2.1")
+    implementation fg.deobf("maven.modrinth:pretty-pipes:1.13.6")
+    implementation fg.deobf("maven.modrinth:refined-storage:1.11.7")
+    implementation fg.deobf("maven.modrinth:create:1.19.2-0.5.1.i")
+    implementation fg.deobf("maven.modrinth:sophisticated-core:1.19.2-0.6.4.730")
+    implementation fg.deobf("maven.modrinth:sophisticated-backpacks:1.19.2-3.20.2.1035")
+    implementation fg.deobf("maven.modrinth:sophisticated-storage:1.19.2-0.9.7.765")
+    implementation fg.deobf("curse.maven:backpacked-352835:4725664")
+
+    runtimeOnly fg.deobf("maven.modrinth:cloth-config:8.3.134+forge")
+    runtimeOnly fg.deobf("maven.modrinth:architectury-api:6.6.92+forge")
+    runtimeOnly fg.deobf("maven.modrinth:rei:9.2.784+forge")
+    runtimeOnly fg.deobf("maven.modrinth:roughly-enough-items-hacks:9.0.90")
+    runtimeOnly fg.deobf("maven.modrinth:unifiedoptions:1.19.2-1.1")
 }
 
 jar {
