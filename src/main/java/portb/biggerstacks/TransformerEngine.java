@@ -50,16 +50,9 @@ public class TransformerEngine implements IMixinConfigPlugin
         TransformerLib.LOGGER = MyLoggerFactory.createMyLogger(LoggerFactory.getLogger(TransformerLib.class));
         //library needs to know how to get the maximum stack size
         TransformerLib.setGlobalStackLimitSupplier(StackSizeRules::getMaxStackSize);
-        
-        try (InputStream stream = TransformerEngine.class.getResourceAsStream("/transformer.xml"))
-        {
-            TransformerLib.loadTransformers(new String(stream.readAllBytes(), StandardCharsets.UTF_8));
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-        
+
+        TransformerLib.loadTransformers(TransformerEngine.class);
+
         plugins.put("biggerstacks_transformer", new ILaunchPluginService()
         {
             @Override
