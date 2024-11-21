@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "[6.0,6.2)", changing: true
         classpath 'org.parchmentmc:librarian:1.+'
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
@@ -15,7 +15,6 @@ buildscript {
 plugins {
     id 'eclipse'
     id 'maven-publish'
-    id 'portb.gradle.MinecraftSubmoduleDependencyPlugin' version "1.2"
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -108,43 +107,34 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 repositories {
     mavenCentral()
     mavenLocal()
-
-    maven { // JEI
-        name 'DVS1 Maven FS'
-        url 'https://dvs1.progwml6.com/files/maven'
-    }
-
     maven {
-        url "https://cursemaven.com"
-        content {
+        url = "https://codeberg.org/api/packages/PORTB/maven"
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        forRepositories(fg.repository)
+        filter {
             includeGroup "curse.maven"
         }
     }
 }
 
-submodules {
-    submodulesDirectory = file("submodules")
-
-    repos {
-        "Applied-Energistics-2" {
-            //disable spotless (it causes build errors because npm isn't installed)
-            customGradleCode = """
-                afterEvaluate {
-                    tasks.spotlessJava.enabled = false
-                    tasks.spotlessJavaCheck.enabled = false
-                    tasks.spotlessJson.enabled = false
-                }
-            """.stripIndent()
-
-            tasks = ["runData", "build"]
-            ignoreErrors = true
-        }
-
-        PrettyPipes {
-            forceForgeGradleVersion="5.1.69"
-        }
-    }
-}
 
 dependencies {
     minecraft "net.minecraftforge:forge:$minecraftVersion-$forgeVersion"
@@ -167,7 +157,23 @@ dependencies {
     //
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.1.255")
+    implementation fg.deobf("maven.modrinth:ae2:forge-11.7.6")
+    implementation fg.deobf("maven.modrinth:cyclic:1.18.2-1.8.1")
+    implementation fg.deobf("maven.modrinth:mcjtylib:1.18-6.0.20")
+    implementation fg.deobf("maven.modrinth:mekanism:10.2.5.465")
+    implementation fg.deobf("maven.modrinth:modular-routers:9.1.2")
+    implementation fg.deobf("maven.modrinth:pretty-pipes:1.12.8")
+    implementation fg.deobf("maven.modrinth:rftools-base:1.18-3.0.12")
+    implementation fg.deobf("maven.modrinth:sophisticated-core:1.18.2-0.6.4.604")
+    implementation fg.deobf("maven.modrinth:sophisticated-backpacks:1.18.2-3.20.3.1063")
+    implementation fg.deobf("maven.modrinth:refined-storage:1.10.6")
+    implementation fg.deobf("maven.modrinth:xnet:1.18-4.0.9")
+
+    runtimeOnly fg.deobf("maven.modrinth:cloth-config:6.5.102-forge")
+    runtimeOnly fg.deobf("maven.modrinth:architectury-api:4.12.94+forge")
+    runtimeOnly fg.deobf("maven.modrinth:rei:8.4.778+forge")
+    runtimeOnly fg.deobf("maven.modrinth:roughly-enough-items-hacks:8.0.89")
+    runtimeOnly fg.deobf("maven.modrinth:unifiedoptions:1.18.2-1.1")
 }
 
 jar {
