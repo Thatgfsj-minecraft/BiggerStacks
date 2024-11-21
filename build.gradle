@@ -117,10 +117,6 @@ repositories {
     maven {
         url = "https://codeberg.org/api/packages/PORTB/maven"
     }
-    maven { // JEI
-        name 'DVS1 Maven FS'
-        url 'https://dvs1.progwml6.com/files/maven'
-    }
     exclusiveContent {
         forRepository {
             maven {
