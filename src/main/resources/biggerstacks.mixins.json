@@ -21,8 +21,6 @@
         "compat.prettypipes.RetrievalModuleItemAccessor",
         "compat.prettypipes.RetrievalModuleItemMixin",
         "compat.refinedstorage.UpgradeItemHandlerMixin",
-        "compat.sophisticatedcore.BackpackContainerMixin",
-        "compat.sophisticatedcore.InventoryHandlerMixin",
         "compat.xnet.XNetCompat",
         "vanilla.AnvilMenuMixin",
         "vanilla.ContainersMixin",
