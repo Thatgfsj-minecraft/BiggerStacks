@@ -1,5 +1,4 @@
 import portb.gradle.ChangelogPrompt;
-import portb.submoduleplugin.SubmodulesPlugin
 
 buildscript {
     repositories {
@@ -20,11 +19,9 @@ buildscript {
 plugins {
     id 'eclipse'
     id 'maven-publish'
-    id 'portb.gradle.ModSubmoduleBuildFromSource' version "1.2.2"
     id "com.modrinth.minotaur" version "2.+"
 }
 
-apply plugin: SubmodulesPlugin
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
@@ -125,13 +122,30 @@ repositories {
     maven {
         url = "https://codeberg.org/api/packages/PORTB/maven"
     }
-}
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        forRepositories(fg.repository)
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
 
-//
-// Submodule config
-//
-submodules {
-    submodulesDirectory = file("submodules")
 }
 
 dependencies {
@@ -151,6 +165,8 @@ dependencies {
         //we do not want xstream's built in parser. We will use stax.
         exclude group: 'io.github.x-stream', module: 'mxparser'
     }
+
+    implementation fg.deobf("maven.modrinth:refined-storage:1.12.4")
 
     //
     // Mixin
