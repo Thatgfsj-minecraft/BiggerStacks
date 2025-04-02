@@ -1,5 +1,5 @@
 /*
- * Copyright (c) PORTB 2023
+ * Copyright (c) PORTB 2025
  *
  * Licensed under GNU LGPL v3
  * https://www.gnu.org/licenses/lgpl-3.0.txt
