@@ -91,10 +91,11 @@ public abstract class ItemRendererMixin
         
         float scale        = (float) calculateStringScale(font, text);
         float inverseScale = 1 / scale;
-        
+        float xTransform = (x + 16) * inverseScale - font.width(text);
+        float yTransform = (y + 16) * inverseScale - font.lineHeight;
         poseStack.scale(scale, scale, 1);
         
-        poseStack.translate((x + 16) * inverseScale - font.width(text), (y + 16) * inverseScale - font.lineHeight, 200);
+        poseStack.translate(xTransform, yTransform, 200);
         
         MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         font.drawInBatch(
@@ -109,7 +110,10 @@ public abstract class ItemRendererMixin
                 /*pBackgroundColour*/ 0,
                 /*pPackedLightCoords*/ 15728880
         );
-        
+
+        // Without this, the position of the durability bar gets messed up with some mods like EMI
+        poseStack.translate(-xTransform, -yTransform, 200);
+
         bufferSource.endBatch();
     }
 }
