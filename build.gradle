@@ -175,13 +175,15 @@ dependencies {
 
     implementation fg.deobf("maven.modrinth:refined-storage:1.12.4")
     implementation fg.deobf("maven.modrinth:emi:1.1.21+1.20.1+forge")
+    implementation fg.deobf("curse.maven:simpletomb-399669:4648847")
+    implementation fg.deobf("curse.maven:flib-661261:6369719")
 
     //
     // Mixin
     //
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-//    runtimeOnly fg.deobf("portb:unifiedoptions:1.20.1-1.1")
+    runtimeOnly fg.deobf("portb:unifiedoptions:1.20.1-1.1")
 }
 
 jar {
