@@ -7,9 +7,13 @@
 
 <transformers>
     <class path="net.minecraft.world.Container" transformChildren="true">
-        <method name="getMaxStackSize" transformer="slotLimit"/>
+        <!--
+        A crash was observed while running EasyShulkerBoxes/puzzlelib due to a class overloading this method, the desc should stop that.
+        However, this should only be possible in a dev environment anyway due to the deobfuscation.
+        ... Unless it was hitting some user method coincidentally called getMaxStackSize, in which case it might cause the uprising of satan!!!
+        -->
+        <method name="getMaxStackSize" transformer="slotLimit" desc="()I"/>
         <method name="m_6893_" transformer="slotLimit"/>
-        <!--        <blacklist>net/minecraft/world/CompoundContainer</blacklist>-->
     </class>
 
     <class path="net/minecraftforge/items/IItemHandler" transformChildren="true">
