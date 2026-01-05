@@ -39,16 +39,6 @@ public class StackSizeHelper
         
         return Math.max(original, original * newStackSize / 64);
     }
-    
-    /**
-     * Increases slot limit without regard for the original size
-     *
-     * @return The new stack size with a minimum value of 64
-     */
-    public static int getNewStackSize()
-    {
-        return Math.max(StackSizeRules.getMaxStackSize(), 64);
-    }
 
     public static void scaleTransferRate(CallbackInfoReturnable<Integer> callbackInfoReturnable, boolean respectSingle)
     {

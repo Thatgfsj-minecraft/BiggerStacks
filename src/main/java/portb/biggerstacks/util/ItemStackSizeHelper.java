@@ -57,11 +57,21 @@ public class ItemStackSizeHelper
             if (returnInfo.getReturnValue() > 1)
             {
                 returnInfo.cancel();
-                returnInfo.setReturnValue(StackSizeHelper.getNewStackSize());
+                returnInfo.setReturnValue(getNewStackSize());
             }
         }
     }
-    
+
+    /**
+     * Increases slot limit without regard for the original size
+     *
+     * @return The new stack size with a minimum value of 64
+     */
+    public static int getNewStackSize()
+    {
+        return Math.max(StackSizeRules.getMaxStackSize(), 64);
+    }
+
     private record TagAccessorImpl(ItemStack item) implements TagAccessor
     {
         @Override
