@@ -211,7 +211,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 modrinth {
-    token = MODRINTH_TOKEN
+    if(project.hasProperty("MODRINTH_TOKEN"))
+        token = MODRINTH_TOKEN
     projectId = modrinthProjectId
     versionNumber = "${project.archivesBaseName}-${project.version}"
     uploadFile = tasks.jarJar.outputs.files.getSingleFile()
