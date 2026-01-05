@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import portb.biggerstacks.config.ServerConfig;
-import portb.biggerstacks.util.StackSizeHelper;
+import portb.biggerstacks.util.SlotLimitHelper;
 
 @Mixin(UpgradeItemHandler.class)
 public class UpgradeItemHandlerMixin
@@ -23,7 +23,7 @@ public class UpgradeItemHandlerMixin
     {
         if (ServerConfig.get().increaseTransferRate.get())
         {
-            StackSizeHelper.scaleTransferRate(returnInfo, false);
+            SlotLimitHelper.scaleTransferRate(returnInfo, false);
         }
     }
 }

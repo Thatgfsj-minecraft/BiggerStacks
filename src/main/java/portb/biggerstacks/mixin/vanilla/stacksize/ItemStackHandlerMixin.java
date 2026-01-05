@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import portb.biggerstacks.util.StackSizeHelper;
+import portb.biggerstacks.util.SlotLimitHelper;
 
 @Mixin(ItemStackHandler.class)
 public class ItemStackHandlerMixin
@@ -20,6 +20,6 @@ public class ItemStackHandlerMixin
     @Inject(method = "getSlotLimit", at = @At("RETURN"), cancellable = true, remap = false)
     private void increaseStackLimit(int slot, CallbackInfoReturnable<Integer> returnInfo)
     {
-        StackSizeHelper.scaleSlotLimit(returnInfo);
+        SlotLimitHelper.scaleSlotLimit(returnInfo);
     }
 }

@@ -10,7 +10,7 @@ package portb.biggerstacks.util;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import portb.biggerstacks.config.StackSizeRules;
 
-public class StackSizeHelper
+public class SlotLimitHelper
 {
     /**
      * Scales the slot limit based on the original value
