@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -19,15 +20,29 @@ import portb.biggerstacks.config.StackSizeRules;
 import portb.configlib.ItemProperties;
 import portb.configlib.TagAccessor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static portb.biggerstacks.BiggerStacks.LOGGER;
 
 public class ItemStackSizeHelper
 {
+    private static Map<Item, Integer> itemStackSizeCache = new HashMap<>();
+
     public static void applyStackSizeToItem(ItemStack itemstack, CallbackInfoReturnable<Integer> returnInfo)
     {
         if (StackSizeRules.getRuleSet() != null)
         {
             var item    = itemstack.getItem();
+
+            // Check if we already determined what size this item has, to avoid doing expensive lookups and shit
+            if (itemStackSizeCache.containsKey(item))
+            {
+                returnInfo.cancel();
+                returnInfo.setReturnValue(itemStackSizeCache.get(item));
+                return;
+            }
+
             var itemKey = ForgeRegistries.ITEMS.getKey(item);
             
             StackSizeRules.getRuleSet().determineStackSizeForItem(
@@ -48,6 +63,8 @@ public class ItemStackSizeHelper
                               returnInfo.cancel();
                               returnInfo.setReturnValue(stackSize);
                           });
+
+            itemStackSizeCache.put(item, returnInfo.getReturnValue());
         }
         else
         {
@@ -80,4 +97,10 @@ public class ItemStackSizeHelper
             return item.is(new TagKey<>(Registries.ITEM, new ResourceLocation(tag)));
         }
     }
+
+    public static void resetCache()
+    {
+        itemStackSizeCache.clear();
+    }
+
 }
