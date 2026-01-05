@@ -29,11 +29,31 @@ public class ItemStackSizeHelper
 {
     private static final Map<Item, Integer> itemStackSizeCache = new HashMap<>();
 
+    public static void applyStackSizeToItem(Item item, CallbackInfoReturnable<Integer> returnInfo)
+    {
+        // Avoid getting a default instance if we already know the stack size for the item
+        if (itemStackSizeCache.containsKey(item))
+        {
+            returnInfo.cancel();
+            returnInfo.setReturnValue(itemStackSizeCache.get(item));
+            return;
+        }
+
+        // If we don't know, then get the default item instance and calculate the stack size
+        applyStackSizeToItem(item.getDefaultInstance(), item, returnInfo);
+    }
+
     public static void applyStackSizeToItem(ItemStack itemstack, CallbackInfoReturnable<Integer> returnInfo)
+    {
+        applyStackSizeToItem(itemstack, null, returnInfo);
+    }
+
+    public static void applyStackSizeToItem(ItemStack itemstack, Item item, CallbackInfoReturnable<Integer> returnInfo)
     {
         if (StackSizeRules.getRuleSet() != null)
         {
-            var item = itemstack.getItem();
+            if(item == null)
+                item = itemstack.getItem();
 
             // Check if we already determined what size this item has, to avoid doing expensive lookups and shit
             if (itemStackSizeCache.containsKey(item))
