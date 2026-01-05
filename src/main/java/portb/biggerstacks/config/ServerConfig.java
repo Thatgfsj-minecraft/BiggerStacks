@@ -16,15 +16,15 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
  */
 public class ServerConfig
 {
-    public final static ServerConfig                 SERVER_INSTANCE = new ServerConfig(true);
-    public final static ServerConfig                 LOCAL_INSTANCE  = new ServerConfig(false);
-    public final        ForgeConfigSpec              SPEC;
-    public final        ForgeConfigSpec.BooleanValue increaseTransferRate;
-    
+    public final static ServerConfig SERVER_INSTANCE = new ServerConfig(true);
+    public final static ServerConfig LOCAL_INSTANCE = new ServerConfig(false);
+    public final ForgeConfigSpec SPEC;
+    public final ForgeConfigSpec.BooleanValue increaseTransferRate;
+
     ServerConfig(boolean isOnlyForDedicatedServer)
     {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-        
+
         if (isOnlyForDedicatedServer && FMLEnvironment.dist.isClient())
         {
             builder.comment(
@@ -34,9 +34,9 @@ public class ServerConfig
                     "IT IS ONLY USED WHEN HOSTING ON LAN"
             );
         }
-        
+
         builder.push("biggerstacks");
-        
+
         increaseTransferRate = builder.comment(
                 "Whether to increase max transfer rate of some mods to the new stack limit/t.",
                 "E.g. if max stack limit is 1000, it will become 1000 items per tick (where applicable).",
@@ -48,17 +48,21 @@ public class ServerConfig
                 "- XNet can already extract a variable amount, but you will be able to go past 64 to the new maximum stack limit",
                 "- Cyclic still extracts 1 stack (more than 64 items) per tick, but the size of the stack is adjusted"
         ).define("Increase transfer rate", true);
-        
+
         builder.pop();
-        
+
         SPEC = builder.build();
     }
-    
+
     public static ServerConfig get()
     {
         if (FMLEnvironment.dist.isDedicatedServer() || !Minecraft.getInstance().hasSingleplayerServer())
+        {
             return SERVER_INSTANCE;
+        }
         else
+        {
             return LOCAL_INSTANCE;
+        }
     }
 }

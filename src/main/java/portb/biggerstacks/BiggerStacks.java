@@ -32,45 +32,47 @@ import portb.slw.MyLoggerFactory;
 public class BiggerStacks
 {
     public final static Logger LOGGER = LogUtils.getLogger();
-    
+
     public BiggerStacks()
     {
         if (FMLEnvironment.dist.isClient())
+        {
             MinecraftForge.EVENT_BUS.register(ClientEvents.class);
-        
+        }
+
         MinecraftForge.EVENT_BUS.register(ServerEvents.class);
         MinecraftForge.EVENT_BUS.register(CommonModEvents.class);
         MinecraftForge.EVENT_BUS.register(CommonForgeEvents.class);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
-        
+
         ConfigLib.LOGGER = MyLoggerFactory.createMyLogger(LoggerFactory.getLogger(ConfigLib.class));
-        
+
         registerConfigs();
     }
-    
+
     private static void registerConfigs()
     {
         ModLoadingContext context = ModLoadingContext.get();
-        
+
         if (FMLEnvironment.dist.isClient())
         {
             context.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, Constants.MOD_ID + "-client.toml");
             context.registerConfig(ModConfig.Type.CLIENT,
-                                   ServerConfig.LOCAL_INSTANCE.SPEC,
-                                   Constants.MOD_ID + "-local.toml"
+                    ServerConfig.LOCAL_INSTANCE.SPEC,
+                    Constants.MOD_ID + "-local.toml"
             );
         }
-        
+
         context.registerConfig(ModConfig.Type.SERVER,
-                               ServerConfig.SERVER_INSTANCE.SPEC,
-                               Constants.MOD_ID + "-server.toml"
+                ServerConfig.SERVER_INSTANCE.SPEC,
+                Constants.MOD_ID + "-server.toml"
         );
     }
-    
+
     void processIMC(final InterModProcessEvent event)
     {
         event.getIMCStream().forEach(imcMessage -> IMCAPI.addIMCRuleSupplier(imcMessage.senderModId(),
-                                                                             imcMessage.messageSupplier()
+                imcMessage.messageSupplier()
         ));
     }
 }

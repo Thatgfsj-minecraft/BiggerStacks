@@ -23,15 +23,15 @@ import java.util.Objects;
 @OnlyIn(Dist.CLIENT)
 public class ClientConfig
 {
-    public static final  ForgeConfigSpec                     SPEC;
-    public static final  ForgeConfigSpec.BooleanValue        enableNumberShortening;
-    private static final Map<String, ChatFormatting>         NUMBER_FORMATTING_COLOURS = new HashMap<>();
+    public static final ForgeConfigSpec SPEC;
+    public static final ForgeConfigSpec.BooleanValue enableNumberShortening;
+    private static final Map<String, ChatFormatting> NUMBER_FORMATTING_COLOURS = new HashMap<>();
     private static final ForgeConfigSpec.ConfigValue<String> numberColour;
-    
+
     static
     {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-        
+
         EnumSet.complementOf(EnumSet.of(
                 ChatFormatting.STRIKETHROUGH,
                 ChatFormatting.BOLD,
@@ -40,22 +40,22 @@ public class ClientConfig
                 ChatFormatting.ITALIC,
                 ChatFormatting.OBFUSCATED
         )).forEach(chatFormatting -> NUMBER_FORMATTING_COLOURS.put(chatFormatting.getName(), chatFormatting));
-        
+
         builder.comment("Client configs");
         enableNumberShortening = builder.comment("Enable number shortening. E.g. 1000000 becomes 1M.")
-                                        .define("Enable number shortening", true);
+                .define("Enable number shortening", true);
         numberColour = builder.comment("The colour of the exact count tooltip shown on items.",
-                                       "Available colours (case insensitive):",
-                                       String.join(",\n", NUMBER_FORMATTING_COLOURS.keySet().stream().sorted().toList())
+                "Available colours (case insensitive):",
+                String.join(",\n", NUMBER_FORMATTING_COLOURS.keySet().stream().sorted().toList())
         ).define("Exact count number colour", ChatFormatting.DARK_AQUA.getName(),
-                 value -> NUMBER_FORMATTING_COLOURS.containsKey(Objects.requireNonNullElse((String) value,
-                                                                                           ""
-                 ).toLowerCase())
+                value -> NUMBER_FORMATTING_COLOURS.containsKey(Objects.requireNonNullElse((String) value,
+                        ""
+                ).toLowerCase())
         );
-        
+
         SPEC = builder.build();
     }
-    
+
     public static ChatFormatting getNumberColour()
     {
         return NUMBER_FORMATTING_COLOURS.get(numberColour.get().toLowerCase());

@@ -27,13 +27,13 @@ import static portb.biggerstacks.BiggerStacks.LOGGER;
 
 public class ItemStackSizeHelper
 {
-    private static Map<Item, Integer> itemStackSizeCache = new HashMap<>();
+    private static final Map<Item, Integer> itemStackSizeCache = new HashMap<>();
 
     public static void applyStackSizeToItem(ItemStack itemstack, CallbackInfoReturnable<Integer> returnInfo)
     {
         if (StackSizeRules.getRuleSet() != null)
         {
-            var item    = itemstack.getItem();
+            var item = itemstack.getItem();
 
             // Check if we already determined what size this item has, to avoid doing expensive lookups and shit
             if (itemStackSizeCache.containsKey(item))
@@ -44,33 +44,34 @@ public class ItemStackSizeHelper
             }
 
             var itemKey = ForgeRegistries.ITEMS.getKey(item);
-            
+
             StackSizeRules.getRuleSet().determineStackSizeForItem(
-                                  new ItemProperties(
-                                          itemKey.getNamespace(),
-                                          itemKey.toString(),
-                                          "", //fixme this was never used anyway. remove it some time.
-                                          returnInfo.getReturnValue(),
-                                          item.isEdible(),
-                                          (item instanceof BlockItem),
-                                          item.canBeDepleted(),
-                                          item instanceof BucketItem,
-                                          new TagAccessorImpl(itemstack),
-                                          item.getClass()
-                                  )
-                          )
-                          .ifPresent((stackSize) -> {
-                              returnInfo.cancel();
-                              returnInfo.setReturnValue(stackSize);
-                          });
+                            new ItemProperties(
+                                    itemKey.getNamespace(),
+                                    itemKey.toString(),
+                                    "", //fixme this was never used anyway. remove it some time.
+                                    returnInfo.getReturnValue(),
+                                    item.isEdible(),
+                                    (item instanceof BlockItem),
+                                    item.canBeDepleted(),
+                                    item instanceof BucketItem,
+                                    new TagAccessorImpl(itemstack),
+                                    item.getClass()
+                            )
+                    )
+                    .ifPresent((stackSize) ->
+                    {
+                        returnInfo.cancel();
+                        returnInfo.setReturnValue(stackSize);
+                    });
 
             itemStackSizeCache.put(item, returnInfo.getReturnValue());
         }
         else
         {
             LOGGER.debug("Stack size ruleset is somehow null, using fallback logic. Called from " +
-                                 CallingClassUtil.getCallerClassName());
-            
+                    CallingClassUtil.getCallerClassName());
+
             if (returnInfo.getReturnValue() > 1)
             {
                 returnInfo.cancel();

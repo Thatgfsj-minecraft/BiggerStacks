@@ -29,74 +29,84 @@ import static portb.biggerstacks.Constants.*;
 @Mixin(GuiGraphics.class)
 public abstract class ItemRendererMixin
 {
-    private static final DecimalFormat BILLION_FORMAT  = new DecimalFormat("#.##B");
-    private static final DecimalFormat MILLION_FORMAT  = new DecimalFormat("#.##M");
+    private static final DecimalFormat BILLION_FORMAT = new DecimalFormat("#.##B");
+    private static final DecimalFormat MILLION_FORMAT = new DecimalFormat("#.##M");
     private static final DecimalFormat THOUSAND_FORMAT = new DecimalFormat("#.##K");
-    
+
     private static String getStringForBigStackCount(int count)
     {
         if (ClientConfig.enableNumberShortening.get())
         {
             var decimal = new BigDecimal(count).round(new MathContext(3)); //pinnacle of over engineering
-            
+
             var value = decimal.doubleValue();
-            
+
             if (value >= ONE_BILLION)
+            {
                 return BILLION_FORMAT.format(value / ONE_BILLION);
+            }
             else if (value >= ONE_MILLION)
+            {
                 return MILLION_FORMAT.format(value / ONE_MILLION);
+            }
             else if (value > ONE_THOUSAND)
+            {
                 return THOUSAND_FORMAT.format(value / ONE_THOUSAND);
+            }
         }
-        
+
         return String.valueOf(count);
     }
-    
+
     private static double calculateStringScale(Font font, String countString)
     {
         var width = font.width(countString);
-        
+
         if (width < 16)
+        {
             return 1.0;
+        }
         else
+        {
             return 16.0 / width;
+        }
     }
-    
+
     // region "delete" all the vanilla item count rendering
     @Redirect(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V",
-              at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
     private void doNothing1(PoseStack instance, float p_254202_, float p_253782_, float p_254238_)
     {
-    
+
     }
-    
+
     @Redirect(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"))
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"))
     private int doNothing2(GuiGraphics instance, Font p_283343_, String p_281896_, int p_283569_, int p_283418_, int p_281560_, boolean p_282130_)
     {
         return 0;
     }
     //endregion
-    
+
     //Inject the new text rendering
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V",
             at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"))
+                    target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"))
     private void renderText(Font font, ItemStack itemStack, int x, int y, String alternateCount, CallbackInfo ci)
     {
         var poseStack = ((GuiGraphics) (Object) this).pose();
-        
+
         String text = alternateCount == null ? getStringForBigStackCount(itemStack.getCount()) : alternateCount;
-        
-        float scale        = (float) calculateStringScale(font, text);
+
+        float scale = (float) calculateStringScale(font, text);
         float inverseScale = 1 / scale;
         float xTransform = (x + 16) * inverseScale - font.width(text);
         float yTransform = (y + 16) * inverseScale - font.lineHeight;
 
         poseStack.scale(scale, scale, 1);
         poseStack.translate(xTransform, yTransform, 200);
-        
+
         MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         font.drawInBatch(
                 text,

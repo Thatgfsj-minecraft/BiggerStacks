@@ -26,13 +26,13 @@ public class FriendlyByteBufMixin
      * This writes the item count as an int instead of a byte.
      */
     @Redirect(method = "writeItemStack",
-              at = @At(value = "INVOKE",
-                       target = "Lnet/minecraft/network/FriendlyByteBuf;writeByte(I)Lio/netty/buffer/ByteBuf;"))
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/network/FriendlyByteBuf;writeByte(I)Lio/netty/buffer/ByteBuf;"))
     private ByteBuf writeBiggerStackCount(FriendlyByteBuf instance, int count)
     {
         return instance.writeInt(count);
     }
-    
+
     /**
      * We can't change the return type of the method, so instead we return a dummy value and modify the variable later.
      * This is essentially what this mixin and {@link #readStackItemCount} does: <br>
@@ -48,12 +48,12 @@ public class FriendlyByteBufMixin
      * </pre>
      */
     @Redirect(method = "readItem",
-              at = @At(value = "INVOKE", target = "Lnet/minecraft/network/FriendlyByteBuf;readByte()B"))
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/network/FriendlyByteBuf;readByte()B"))
     private byte doNothing(FriendlyByteBuf instance)
     {
         return 0; // do nothing, because we cannot change the return type of this method
     }
-    
+
     /**
      * See {@link #doNothing(FriendlyByteBuf)}
      */

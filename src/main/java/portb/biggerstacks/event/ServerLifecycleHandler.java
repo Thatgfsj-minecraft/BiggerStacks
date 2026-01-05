@@ -23,8 +23,8 @@ import static portb.biggerstacks.Constants.RULESET_FILE;
 public class ServerLifecycleHandler
 {
     private final ConfigFileWatcher watcher = new ConfigFileWatcher(RULESET_FILE);
-    private       boolean           stopped = false;
-    
+    private boolean stopped = false;
+
     /**
      * Parses the config file and starts the file watcher
      * Called when server starts (ServerAboutToStart)
@@ -33,21 +33,21 @@ public class ServerLifecycleHandler
     {
         //read the ruleset file
         StackSizeRules.setRuleSet(ConfigLib.readRuleset(RULESET_FILE));
-        
+
         //configure and start the watcher
         watcher.setOnUpdateAction(this::notifyClientsOfConfigChange);
         watcher.start();
     }
-    
+
     private void notifyClientsOfConfigChange(RuleSet ruleSet)
     {
         //update our ruleset
         StackSizeRules.setRuleSet(ruleSet);
-        
+
         //send new ruleset to clients
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), new ClientboundRulesUpdatePacket(ruleSet));
     }
-    
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void serverStopping(ServerStoppingEvent event)
     {
@@ -58,7 +58,7 @@ public class ServerLifecycleHandler
             stopped = true;
         }
     }
-    
+
     public void ensureStopped()
     {
         if (!stopped)
@@ -67,5 +67,5 @@ public class ServerLifecycleHandler
             stopped = true;
         }
     }
-    
+
 }

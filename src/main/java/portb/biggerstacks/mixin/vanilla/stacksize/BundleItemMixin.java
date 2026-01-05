@@ -21,9 +21,9 @@ public class BundleItemMixin
     {
         return (float) ItemStackSizeHelper.getNewStackSize();
     }
-    
+
     @ModifyConstant(method = {"overrideStackedOnOther", "getBarWidth", "getWeight", "appendHoverText", "add"},
-                    constant = @Constant(intValue = 64))
+            constant = @Constant(intValue = 64))
     private static int increaseStackLimit(int value)
     {
         return ItemStackSizeHelper.getNewStackSize();

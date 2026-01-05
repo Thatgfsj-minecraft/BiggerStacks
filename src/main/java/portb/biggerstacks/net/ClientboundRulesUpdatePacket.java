@@ -13,33 +13,25 @@ import portb.configlib.xml.RuleSet;
 /**
  * Packet sent to clients when the config file is updated
  */
-public class ClientboundRulesUpdatePacket
+public record ClientboundRulesUpdatePacket(RuleSet rules)
 {
-    private final RuleSet rules;
-    
     /**
      * Used for play to client
      */
-    public ClientboundRulesUpdatePacket(RuleSet rules)
+    public ClientboundRulesUpdatePacket
     {
-        this.rules = rules;
     }
-    
+
     /**
      * Decodes a packet from a byte buffer
      */
     public ClientboundRulesUpdatePacket(FriendlyByteBuf buf)
     {
-        rules = RuleSet.fromBytes(buf.readByteArray());
+        this(RuleSet.fromBytes(buf.readByteArray()));
     }
-    
+
     public void encode(FriendlyByteBuf buf)
     {
         buf.writeByteArray(rules.toBytes());
-    }
-    
-    public RuleSet getRules()
-    {
-        return rules;
     }
 }

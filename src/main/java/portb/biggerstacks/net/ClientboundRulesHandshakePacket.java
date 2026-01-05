@@ -17,7 +17,7 @@ import portb.configlib.xml.RuleSet;
 public class ClientboundRulesHandshakePacket
 {
     private final RuleSet rules;
-    
+
     /**
      * Decodes a packet from a byte buffer
      */
@@ -25,7 +25,7 @@ public class ClientboundRulesHandshakePacket
     {
         rules = RuleSet.fromBytes(buf.readByteArray());
     }
-    
+
     /**
      * Construct a packet which contains the loaded ruleset
      */
@@ -34,12 +34,12 @@ public class ClientboundRulesHandshakePacket
     {
         rules = StackSizeRules.getRuleSet();
     }
-    
+
     public void encode(FriendlyByteBuf buf)
     {
         buf.writeByteArray(rules.toBytes());
     }
-    
+
     public RuleSet getRules()
     {
         return rules;

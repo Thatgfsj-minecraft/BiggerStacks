@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 public class ConfigCommand
 {
     public final static Logger LOGGER = LogUtils.getLogger();
-    
+
     /**
      * Despite not reaching across logical sides, this command is intended to work only on singleplayer.
      * See {@link ServerboundCreateConfigTemplatePacket#handleCreateConfigTemplate(ServerboundCreateConfigTemplatePacket, Supplier)}, where the packet the client sends to the server is ignored by a dedicated server
@@ -39,12 +39,13 @@ public class ConfigCommand
     public static void register(RegisterCommandsEvent event)
     {
         var cmd = Commands.literal("biggerstacks").then(Commands.literal("quicksetup").executes(
-                context -> {
+                context ->
+                {
                     try
                     {
-                        boolean         hasCustomExistingFile = false;
-                        TemplateOptions template              = new TemplateOptions(64, 1, 1);
-                        
+                        boolean hasCustomExistingFile = false;
+                        TemplateOptions template = new TemplateOptions(64, 1, 1);
+
                         if (Files.exists(Constants.RULESET_FILE))
                         {
                             try
@@ -58,9 +59,9 @@ public class ConfigCommand
                                 hasCustomExistingFile = true;
                             }
                         }
-                        
+
                         var player = context.getSource().getPlayerOrException();
-                        
+
                         PacketHandler.INSTANCE.send(
                                 PacketDistributor.PLAYER.with(() -> player),
                                 new ClientboundConfigureScreenOpenPacket(
@@ -76,15 +77,17 @@ public class ConfigCommand
                         context.getSource().sendFailure(Component.translatable("biggerstacks.player.expected"));
                         return 0;
                     }
-                    
+
                     return 1;
                 })
         );
-        
+
         //if on a server, require permissions
         if (FMLEnvironment.dist.isDedicatedServer())
+        {
             cmd.requires(commandSourceStack -> commandSourceStack.hasPermission(Constants.CHANGE_STACK_SIZE_COMMAND_PERMISSION_LEVEL));
-        
+        }
+
         event.getDispatcher().register(cmd);
     }
 }

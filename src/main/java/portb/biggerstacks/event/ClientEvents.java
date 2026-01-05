@@ -33,23 +33,25 @@ public class ClientEvents
     static public void showExactItemStackCount(ItemTooltipEvent event)
     {
         if (!ClientConfig.enableNumberShortening.get())
+        {
             return;
-        
+        }
+
         var stack = event.getItemStack();
-        
+
         if (stack.getCount() > Constants.ONE_THOUSAND)
         {
             event.getToolTip()
-                 .add(1,
-                      Component.translatable("biggerstacks.exact.count",
-                                             Component.literal(TOOLTIP_NUMBER_FORMAT.format(stack.getCount()))
-                                                      .withStyle(ClientConfig.getNumberColour())
-                               )
-                               .withStyle(ChatFormatting.GRAY)
-                 );
+                    .add(1,
+                            Component.translatable("biggerstacks.exact.count",
+                                            Component.literal(TOOLTIP_NUMBER_FORMAT.format(stack.getCount()))
+                                                    .withStyle(ClientConfig.getNumberColour())
+                                    )
+                                    .withStyle(ChatFormatting.GRAY)
+                    );
         }
     }
-    
+
     /**
      * Unloads the ruleset when the client disconnects from a world/server
      */

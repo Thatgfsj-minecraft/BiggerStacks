@@ -26,7 +26,8 @@
     <class path="net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeItem" transformChildren="false">
         <method name="canRemoveUpgradeFrom" transformer="replace64"/>
         <method name="canSwapUpgradeFor" transformer="replace64"/>
-        <method name="getInventorySlotLimit" transformer="replace64D" desc="(Lnet/p3pp3rf1y/sophisticatedcore/api/IStorageWrapper;D)I"/>
+        <method name="getInventorySlotLimit" transformer="replace64D"
+                desc="(Lnet/p3pp3rf1y/sophisticatedcore/api/IStorageWrapper;D)I"/>
         <method name="canRemoveUpgradeFrom" transformer="replace64D"/>
         <method name="canSwapUpgradeFor" transformer="replace64D"/>
     </class>

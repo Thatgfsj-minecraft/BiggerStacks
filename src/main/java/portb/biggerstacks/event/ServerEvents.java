@@ -19,7 +19,7 @@ import portb.biggerstacks.Constants;
 public class ServerEvents
 {
     private static ServerLifecycleHandler handler;
-    
+
     /**
      * Creates a ServerLifecycleHandler that manages config updates
      */
@@ -27,10 +27,10 @@ public class ServerEvents
     public static void serverStarting(ServerAboutToStartEvent event)
     {
         handler = new ServerLifecycleHandler();
-        
+
         MinecraftForge.EVENT_BUS.register(handler);
     }
-    
+
     /**
      * Unregisters the handler
      */
@@ -38,8 +38,8 @@ public class ServerEvents
     public static void serverStopping(ServerStoppingEvent event)
     {
         MinecraftForge.EVENT_BUS.unregister(handler);
-        
+
         handler.ensureStopped();
     }
-    
+
 }
