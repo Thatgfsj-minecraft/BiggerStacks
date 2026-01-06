@@ -71,4 +71,14 @@ public class SlotLimitHelper
 
         return Math.max(1, StackSizeRules.getMaxStackSize());
     }
+
+    /**
+     * Increases slot limit without regard for the original size
+     *
+     * @return The new stack size with a minimum value of 64
+     */
+    public static int getNewStackSize()
+    {
+        return Math.max(StackSizeRules.getMaxStackSize(), 64);
+    }
 }
