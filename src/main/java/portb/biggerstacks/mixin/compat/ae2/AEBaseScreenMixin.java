@@ -16,7 +16,7 @@ import portb.biggerstacks.util.SlotLimitHelper;
 @Mixin(AEBaseScreen.class)
 public class AEBaseScreenMixin
 {
-    @ModifyConstant(method = "checkHotbarKeyPressed", constant = @Constant(intValue = 64), remap = false)
+    @ModifyConstant(method = "checkHotbarKeyPressed", constant = @Constant(intValue = 64))
     private int increaseStackLimit(int val)
     {
         return SlotLimitHelper.getNewStackSize();
