@@ -101,8 +101,8 @@ public abstract class ItemRendererMixin
 
         float scale = (float) calculateStringScale(font, text);
         float inverseScale = 1 / scale;
-        float xTransform = (x + 16) * inverseScale - font.width(text);
-        float yTransform = (y + 16) * inverseScale - font.lineHeight;
+        float xTransform = (x + 16) * inverseScale - font.width(text) + 1;
+        float yTransform = (y + 16) * inverseScale - font.lineHeight + 2;
 
         poseStack.scale(scale, scale, 1);
         poseStack.translate(xTransform, yTransform, 200);
