@@ -6,6 +6,12 @@
   "plugin": "portb.biggerstacks.TransformerEngine",
   "refmap": "biggerstacks.refmap.json",
   "mixins": [
+    "compat.ae2.GenericStackInvMixin",
+    "compat.ae2.InternalInventoryMixin",
+    "compat.ae2.IOBusPartMixin",
+    "compat.modularrouters.CompiledModuleMixin",
+    "compat.modularrouters.ModularRouterBlockEntityMixin",
+    "compat.modularrouters.ModularRoutersStackUpgradeMixin",
     "compat.refinedstorage.UpgradeItemHandlerMixin",
     "vanilla.AnvilMenuMixin",
     "vanilla.ContainersMixin",
@@ -19,7 +25,8 @@
     "vanilla.stacksize.ServerGamePacketListenerImplMixin"
   ],
   "client": [
-    "client.ItemRendererMixin"
+    "client.ItemRendererMixin",
+    "compat.ae2.AEBaseScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
