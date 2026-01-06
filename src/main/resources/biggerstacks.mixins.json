@@ -9,6 +9,7 @@
     "compat.ae2.GenericStackInvMixin",
     "compat.ae2.InternalInventoryMixin",
     "compat.ae2.IOBusPartMixin",
+    "compat.betterbundles.SizedBundleItemMixin",
     "compat.modularrouters.CompiledModuleMixin",
     "compat.modularrouters.ModularRouterBlockEntityMixin",
     "compat.modularrouters.ModularRoutersStackUpgradeMixin",
