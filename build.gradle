@@ -182,6 +182,9 @@ dependencies {
     implementation fg.deobf("maven.modrinth:sophisticated-core:1.20.1-1.2.40.940")
     implementation fg.deobf("maven.modrinth:modular-routers:12.1.1")
     implementation fg.deobf("maven.modrinth:betterbundles:1.20.1-1.1.0")
+    implementation fg.deobf("maven.modrinth:chisel-reborn:forge-1.20.1-2.0.0")
+    implementation fg.deobf("maven.modrinth:architectury-api:9.2.14+forge")
+    implementation fg.deobf("maven.modrinth:cryonicconfig:forge-1.20.1-1.0.0")
 
     //
     // Mixin
