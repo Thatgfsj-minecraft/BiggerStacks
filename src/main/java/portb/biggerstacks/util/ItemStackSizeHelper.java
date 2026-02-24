@@ -52,8 +52,10 @@ public class ItemStackSizeHelper
     {
         if (StackSizeRules.getRuleSet() != null)
         {
-            if(item == null)
+            if (item == null)
+            {
                 item = itemstack.getItem();
+            }
 
             // Check if we already determined what size this item has, to avoid doing expensive lookups and shit
             if (itemStackSizeCache.containsKey(item))
@@ -100,6 +102,11 @@ public class ItemStackSizeHelper
         }
     }
 
+    public static void resetCache()
+    {
+        itemStackSizeCache.clear();
+    }
+
     private record TagAccessorImpl(ItemStack item) implements TagAccessor
     {
         @Override
@@ -108,10 +115,4 @@ public class ItemStackSizeHelper
             return item.is(new TagKey<>(Registries.ITEM, new ResourceLocation(tag)));
         }
     }
-
-    public static void resetCache()
-    {
-        itemStackSizeCache.clear();
-    }
-
 }
