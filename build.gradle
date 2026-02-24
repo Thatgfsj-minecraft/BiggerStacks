@@ -43,8 +43,7 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 
 minecraft {
     mappings channel: 'official', version: minecraftVersion
-    //no parchment for 1.19.4
-    //mappings channel: 'parchment', version: "$parchmentVersion-$minecraftVersion"
+    mappings channel: 'parchment', version: "$parchmentVersion-$minecraftVersion"
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
