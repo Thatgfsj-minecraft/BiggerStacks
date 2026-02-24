@@ -57,7 +57,7 @@ public class TransformerEngine implements IMixinConfigPlugin
         
         try
         {
-            TransformerLib.loadTransformers(new String(IOUtils.toByteArray(Objects.requireNonNull(TransformerEngine.class.getResource(
+            TransformerLib.loadTransformersFromXML(new String(IOUtils.toByteArray(Objects.requireNonNull(TransformerEngine.class.getResource(
                     "/transformer.xml"))), StandardCharsets.UTF_8));
         }
         catch (IOException e)
