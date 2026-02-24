@@ -29,10 +29,7 @@ public abstract class ItemStackMixin
             cancellable = true)
     private void increaseStackLimit(CallbackInfoReturnable<Integer> returnInfo)
     {
-        @SuppressWarnings("ConstantConditions") var itemstack = ((ItemStack) (Object) this);
-        var                                         item      = itemstack.getItem();
-        
-        ItemStackSizeHelper.applyStackSizeToItem(itemstack, item, returnInfo);
+        ItemStackSizeHelper.applyStackSizeToItem((ItemStack) (Object) this, returnInfo);
     }
     
     /**
