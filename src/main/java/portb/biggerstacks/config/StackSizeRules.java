@@ -8,6 +8,7 @@
 package portb.biggerstacks.config;
 
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import portb.biggerstacks.util.ItemStackSizeHelper;
 import portb.configlib.xml.RuleSet;
 
 public class StackSizeRules
@@ -27,6 +28,7 @@ public class StackSizeRules
     public static void setRuleSet(RuleSet ruleSet)
     {
         StackSizeRules.ruleSet = ruleSet;
+        ItemStackSizeHelper.resetCache();
     }
     
     public static int getMaxStackSize()

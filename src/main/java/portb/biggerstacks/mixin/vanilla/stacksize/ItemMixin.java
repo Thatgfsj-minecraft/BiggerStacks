@@ -25,6 +25,6 @@ public class ItemMixin
             cancellable = true)
     private void increaseStackLimit(CallbackInfoReturnable<Integer> returnInfo)
     {
-        ItemStackSizeHelper.applyStackSizeToItem(returnInfo, ((Item) (Object) this).getDefaultInstance());
+        ItemStackSizeHelper.applyStackSizeToItem(((Item) (Object) this), returnInfo);
     }
 }
