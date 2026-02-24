@@ -132,8 +132,9 @@ repositories {
                 url "https://cursemaven.com"
             }
         }
+        forRepositories(fg.repository) // undocumented extra thing that you need, nice.
         filter {
-            includeGroup "maven.curse"
+            includeGroup "curse.maven"
         }
     }
 }
@@ -152,7 +153,7 @@ minecraft.runs.all {
 dependencies {
     minecraft "net.minecraftforge:forge:$minecraftVersion-$forgeVersion"
 
-    implementation fg.deobf("maven.curse:ae2-223794:3608871") //1.16.5 version not on modrinth
+    implementation fg.deobf("curse.maven:ae2-223794:3608871") //1.16.5 version not on modrinth
     implementation fg.deobf("maven.modrinth:pretty-pipes:1.9.8")
     implementation fg.deobf("maven.modrinth:cyclic:1.16.5-1.6.1")
     implementation fg.deobf("maven.modrinth:refined-storage:ubJGKwUA")
