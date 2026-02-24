@@ -15,7 +15,6 @@ buildscript {
 plugins {
     id 'eclipse'
     id 'maven-publish'
-    id 'portb.gradle.MinecraftSubmoduleDependencyPlugin' version "1.1"
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -105,47 +104,6 @@ mixin {
     config "biggerstacks.mixins.json"
 }
 
-submodules {
-    submodulesDirectory = file("submodules")
-
-    //System.properties.'java.home')
-
-    repos {
-        //these mods use snapshot mapping (incompatible) and must be compiled with reobf enabled
-        "Applied-Energistics-2" {
-            //disable spotless (it causes build errors because npm isn't installed)
-            customGradleCode = """
-                afterEvaluate {
-                    tasks.spotlessJava.enabled = false
-                    tasks.spotlessJavaCheck.enabled = false
-                    tasks.spotlessJson.enabled = false
-                }
-            """
-
-            reobfTaskName = "named(\"reobfJar\").get()"
-            tasks = ["build"]
-            enableDeobf = false
-        }
-
-        Cyclic {
-            enableDeobf = false
-        }
-
-        PrettyPipes {
-            enableDeobf = false
-
-            //need to manually enable reobfJar for this one...
-            customGradleCode = """
-                jar.finalizedBy('reobfJar') 
-            """.stripIndent()
-        }
-
-        refinedstorage {
-            enableDeobf = false
-        }
-    }
-}
-
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
@@ -156,11 +114,26 @@ repositories {
         name 'DVS1 Maven FS'
         url 'https://dvs1.progwml6.com/files/maven'
     }
-
-    maven {
-        url "https://cursemaven.com"
-        content {
-            includeGroup "curse.maven"
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "maven.curse"
         }
     }
 }
@@ -178,6 +151,18 @@ minecraft.runs.all {
 
 dependencies {
     minecraft "net.minecraftforge:forge:$minecraftVersion-$forgeVersion"
+
+    implementation fg.deobf("maven.curse:ae2-223794:3608871") //1.16.5 version not on modrinth
+    implementation fg.deobf("maven.modrinth:pretty-pipes:1.9.8")
+    implementation fg.deobf("maven.modrinth:cyclic:1.16.5-1.6.1")
+    implementation fg.deobf("maven.modrinth:refined-storage:ubJGKwUA")
+    implementation fg.deobf("maven.modrinth:modular-routers:1.16.5-7.5.4")
+    implementation fg.deobf("maven.modrinth:mekanism:DlhxRTKL")
+    implementation fg.deobf("maven.modrinth:sophisticated-backpacks:1.16.5-3.15.20.755")
+    implementation fg.deobf("maven.modrinth:xnet:1.16-3.0.17")
+    // pointless mcjty ""library"" mods that exist only to farm downloads and bloat the dependency/mod count
+    implementation fg.deobf("maven.modrinth:mcjtylib:1.16-5.1.8")
+    implementation fg.deobf("maven.modrinth:rftools-base:1.16-2.1.5")
 
     //
     // Embedded libraries
