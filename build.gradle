@@ -167,7 +167,7 @@ dependencies {
             "portb:BiggerStacksTransformerLib:$transformerLibVersion",
             "portb:SimpleLoggerWrapper:$simpleLoggerWrapperVersion"
 
-    jarJar("com.thoughtworks.xstream:xstream:[1.4.20]") {
+    jarJar("com.thoughtworks.xstream:xstream:[1.4.21]") {
         //we do not want xstream's built in parser. We will use stax.
         exclude group: 'io.github.x-stream', module: 'mxparser'
     }
