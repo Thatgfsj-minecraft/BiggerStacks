@@ -21,9 +21,13 @@ public class CompiledModuleMixin
     private int increaseTransferRate(int value)
     {
         if (ServerConfig.get().increaseTransferRate.get())
+        {
             return SlotLimitHelper.increaseTransferRate(value);
+        }
         else
+        {
             return value;
+        }
     }
 }
 

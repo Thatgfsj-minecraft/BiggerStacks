@@ -25,8 +25,9 @@ public class SizedBundleItemMixin
     @Shadow
     protected int size;
 
-    @Redirect(method = "*", at= @At(value = "FIELD", target = "Lde/cheaterpaul/betterbundles/SizedBundleItem;size:I", opcode = Opcodes.GETFIELD) )
-    private int redirectSizeField_biggerstacks(SizedBundleItem sbi) {
+    @Redirect(method = "*", at = @At(value = "FIELD", target = "Lde/cheaterpaul/betterbundles/SizedBundleItem;size:I", opcode = Opcodes.GETFIELD))
+    private int redirectSizeField_biggerstacks(SizedBundleItem sbi)
+    {
         return SlotLimitHelper.scaleSlotLimit(this.size);
     }
 

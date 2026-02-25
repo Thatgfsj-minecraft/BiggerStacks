@@ -22,7 +22,9 @@ public class IOBusPartMixin
     private void increaseTransferRate(CallbackInfoReturnable<Integer> returnInfo)
     {
         if (ServerConfig.get().increaseTransferRate.get())
+        {
             SlotLimitHelper.scaleSlotLimit(returnInfo);
+        }
     }
-    
+
 }
