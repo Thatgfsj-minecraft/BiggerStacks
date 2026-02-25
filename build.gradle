@@ -172,6 +172,9 @@ dependencies {
         exclude group: 'io.github.x-stream', module: 'mxparser'
     }
 
+    //
+    // Mods with compat modules
+    //
     implementation fg.deobf("maven.modrinth:ae2:15.4.10")
     implementation fg.deobf("maven.modrinth:guideme:20.1.14")
     implementation fg.deobf("maven.modrinth:refined-storage:1.12.4")
@@ -184,6 +187,11 @@ dependencies {
     implementation fg.deobf("maven.modrinth:chisel-reborn:forge-1.20.1-2.0.0")
     implementation fg.deobf("maven.modrinth:architectury-api:9.2.14+forge")
     implementation fg.deobf("maven.modrinth:cryonicconfig:forge-1.20.1-1.0.0")
+
+    //
+    // Testing
+    //
+    runtimeOnly fg.deobf("maven.modrinth:timeless-and-classics-zero:1.1.7-hotfix")
 
     //
     // Mixin
