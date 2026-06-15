@@ -8,6 +8,7 @@
     <class path="net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler" transformChildren="false">
         <method name="getBaseStackLimit" transformer="replace64"/>
         <method name="getBaseStackLimit" transformer="replace64D"/>
+        <method name="setBaseSlotLimit" transformer="replace64D"/>
     </class>
 
     <class path="net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase" transformChildren="false">
@@ -24,16 +25,16 @@
     </class>
 
     <class path="net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeItem" transformChildren="false">
-        <method name="canRemoveUpgradeFrom" transformer="replace64"/>
-        <method name="canSwapUpgradeFor" transformer="replace64"/>
-        <method name="getInventorySlotLimit" transformer="replace64D"
-                desc="(Lnet/p3pp3rf1y/sophisticatedcore/api/IStorageWrapper;D)I"/>
         <method name="canRemoveUpgradeFrom" transformer="replace64D"/>
         <method name="canSwapUpgradeFor" transformer="replace64D"/>
+        <method name="getInventorySlotLimit" transformer="replace64D"
+                desc="(D)I" debug=""/>
+        <method name="checkExtraInsertConditions" transformer="replace64D"/>
+        <method name="isMultiplierHighEnough" transformer="replace64D"/>
     </class>
 
     <class path="net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper" transformChildren="false">
-        <method name="getAnalogOutputSignal" transformer="replace64"/>
+        <method name="lambda$getAnalogOutputSignal$17" transformer="replace64D"/>
     </class>
 
     <class path="net.p3pp3rf1y.sophisticatedcore.util.NoopStorageWrapper" transformChildren="false">
