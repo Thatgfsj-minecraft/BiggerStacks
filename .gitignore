@@ -126,3 +126,6 @@ gametestrun
 # ModDevGradle run directories
 run/
 run-data/
+
+# Nested (jar-in-jar) libraries shipped inside the mod jar
+!src/main/resources/META-INF/jars/*.jar

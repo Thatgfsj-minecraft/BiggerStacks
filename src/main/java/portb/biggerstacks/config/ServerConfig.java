@@ -7,52 +7,64 @@
 
 package portb.biggerstacks.config;
 
-import net.minecraft.client.Minecraft;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import net.fabricmc.loader.api.FabricLoader;
+import portb.biggerstacks.BiggerStacks;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
- * Server side config for stack size and transfer rate tweaks.
+ * Server side config. Kept as a plain JSON file because Fabric has no built-in config API.
  */
 public class ServerConfig
 {
-    public final static ServerConfig SERVER_INSTANCE = new ServerConfig(true);
-    public final static ServerConfig LOCAL_INSTANCE  = new ServerConfig(false);
-    public final        ModConfigSpec SPEC;
-    public final        ModConfigSpec.BooleanValue increaseTransferRate;
+    private static final Path FILE = FabricLoader.getInstance()
+            .getConfigDir()
+            .resolve("biggerstacks-server.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    ServerConfig(boolean isOnlyForDedicatedServer)
+    public static boolean increaseTransferRate = true;
+
+    public static void load()
     {
-        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
-
-        if (isOnlyForDedicatedServer && FMLEnvironment.getDist().isClient())
+        if (Files.exists(FILE))
         {
-            builder.comment(
-                    "IGNORE THIS CONFIG FILE!!!!",
-                    "IGNORE THIS CONFIG FILE!!!!",
-                    "IGNORE THIS CONFIG FILE!!!!",
-                    "IT IS ONLY USED WHEN HOSTING ON LAN"
-            );
+            try
+            {
+                JsonObject json = JsonParser.parseString(Files.readString(FILE, StandardCharsets.UTF_8)).getAsJsonObject();
+                if (json.has("increaseTransferRate"))
+                    increaseTransferRate = json.get("increaseTransferRate").getAsBoolean();
+            }
+            catch (IOException | RuntimeException e)
+            {
+                BiggerStacks.LOGGER.warn("Could not read {}", FILE, e);
+            }
         }
-
-        builder.push("biggerstacks");
-
-        increaseTransferRate = builder.comment(
-                "Whether to increase max transfer rate of some mods to the new stack limit/t.",
-                "E.g. if max stack limit is 1000, it will become 1000 items per tick (where applicable).",
-                "How this is done will vary for each mod"
-        ).define("Increase transfer rate", true);
-
-        builder.pop();
-
-        SPEC = builder.build();
+        else
+        {
+            save();
+        }
     }
 
-    public static ServerConfig get()
+    public static void save()
     {
-        if (FMLEnvironment.getDist().isDedicatedServer() || !Minecraft.getInstance().hasSingleplayerServer())
-            return SERVER_INSTANCE;
-        else
-            return LOCAL_INSTANCE;
+        JsonObject json = new JsonObject();
+        json.addProperty("increaseTransferRate", increaseTransferRate);
+
+        try
+        {
+            Files.createDirectories(FILE.getParent());
+            Files.writeString(FILE, GSON.toJson(json), StandardCharsets.UTF_8);
+        }
+        catch (IOException e)
+        {
+            BiggerStacks.LOGGER.warn("Could not write {}", FILE, e);
+        }
     }
 }

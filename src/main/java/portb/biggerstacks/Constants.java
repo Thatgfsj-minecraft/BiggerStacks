@@ -7,10 +7,10 @@
 
 package portb.biggerstacks;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.Commands;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.permissions.PermissionCheck;
-import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
 import java.text.DecimalFormat;
@@ -23,7 +23,9 @@ public class Constants
 
     public static final String MOD_ID            = "biggerstacks";
     public static final String RULESET_FILE_NAME = "biggerstacks-rules.xml";
-    public static final Path   RULESET_FILE      = FMLPaths.CONFIGDIR.get().resolve(Constants.RULESET_FILE_NAME);
+    public static final Path   RULESET_FILE      = FabricLoader.getInstance()
+            .getConfigDir()
+            .resolve(Constants.RULESET_FILE_NAME);
 
     public static final Identifier CONFIG_GUI_BG = Identifier.fromNamespaceAndPath(Constants.MOD_ID,
             "textures/gui/config_background.png");

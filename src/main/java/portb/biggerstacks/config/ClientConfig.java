@@ -7,55 +7,83 @@
 
 package portb.biggerstacks.config;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.neoforge.common.ModConfigSpec;
+import portb.biggerstacks.BiggerStacks;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Config used for client-side only things, such as how stack numbers are rendered.
+ * Client side config. Kept as a plain JSON file because Fabric has no built-in config API.
  */
 public class ClientConfig
 {
-    public static final  ModConfigSpec                     SPEC;
-    public static final  ModConfigSpec.BooleanValue        enableNumberShortening;
-    private static final Map<String, ChatFormatting>       NUMBER_FORMATTING_COLOURS = new HashMap<>();
-    private static final ModConfigSpec.ConfigValue<String> numberColour;
-    
-    static
+    private static final Path FILE = FabricLoader.getInstance()
+            .getConfigDir()
+            .resolve("biggerstacks-client.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    public static boolean enableNumberShortening = true;
+    public static String  numberColour           = ChatFormatting.DARK_AQUA.getName();
+
+    public static void load()
     {
-        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
-        
-        EnumSet.complementOf(EnumSet.of(
-                ChatFormatting.STRIKETHROUGH,
-                ChatFormatting.BOLD,
-                ChatFormatting.RESET,
-                ChatFormatting.UNDERLINE,
-                ChatFormatting.ITALIC,
-                ChatFormatting.OBFUSCATED
-        )).forEach(chatFormatting -> NUMBER_FORMATTING_COLOURS.put(chatFormatting.getName(), chatFormatting));
-        
-        builder.comment("Client configs");
-        enableNumberShortening = builder.comment("Enable number shortening. E.g. 1000000 becomes 1M.")
-                                        .define("Enable number shortening", true);
-        numberColour = builder.comment("The colour of the exact count tooltip shown on items.",
-                                       "Available colours (case insensitive):",
-                                       String.join(",\n", NUMBER_FORMATTING_COLOURS.keySet().stream().sorted().toList())
-        ).define("Exact count number colour", ChatFormatting.DARK_AQUA.getName(),
-                 value -> NUMBER_FORMATTING_COLOURS.containsKey(Objects.requireNonNullElse((String) value,
-                                                                                           ""
-                 ).toLowerCase())
-        );
-        
-        SPEC = builder.build();
+        if (Files.exists(FILE))
+        {
+            try
+            {
+                JsonObject json = JsonParser.parseString(Files.readString(FILE, StandardCharsets.UTF_8)).getAsJsonObject();
+                if (json.has("enableNumberShortening"))
+                    enableNumberShortening = json.get("enableNumberShortening").getAsBoolean();
+                if (json.has("numberColour"))
+                    numberColour = json.get("numberColour").getAsString();
+            }
+            catch (IOException | RuntimeException e)
+            {
+                BiggerStacks.LOGGER.warn("Could not read {}", FILE, e);
+            }
+        }
+        else
+        {
+            save();
+        }
     }
-    
+
+    public static void save()
+    {
+        JsonObject json = new JsonObject();
+        json.addProperty("enableNumberShortening", enableNumberShortening);
+        json.addProperty("numberColour", numberColour);
+
+        try
+        {
+            Files.createDirectories(FILE.getParent());
+            Files.writeString(FILE, GSON.toJson(json), StandardCharsets.UTF_8);
+        }
+        catch (IOException e)
+        {
+            BiggerStacks.LOGGER.warn("Could not write {}", FILE, e);
+        }
+    }
+
     public static ChatFormatting getNumberColour()
     {
-        return NUMBER_FORMATTING_COLOURS.get(numberColour.get().toLowerCase());
+        try
+        {
+            return Objects.requireNonNull(ChatFormatting.getByName(numberColour.toLowerCase(Locale.ROOT)));
+        }
+        catch (RuntimeException e)
+        {
+            return ChatFormatting.DARK_AQUA;
+        }
     }
 }

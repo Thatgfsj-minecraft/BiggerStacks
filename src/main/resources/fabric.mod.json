@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "biggerstacks",
+  "version": "${version}",
+  "name": "Bigger Stacks",
+  "description": "Allows increasing stack sizes past 64 up to MAXINT/2 (about 1 billion)",
+  "authors": [
+    "PORTB"
+  ],
+  "license": "GNU LGPLv3",
+  "icon": "BiggerStacks.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "portb.biggerstacks.BiggerStacks"
+    ],
+    "client": [
+      "portb.biggerstacks.client.BiggerStacksClient"
+    ]
+  },
+  "mixins": [
+    "biggerstacks.mixins.json"
+  ],
+  "jars": [
+    {
+      "file": "META-INF/jars/BiggerStacksConfigLib-2026.02.25.jar"
+    },
+    {
+      "file": "META-INF/jars/SimpleLoggerWrapper-1.0.jar"
+    },
+    {
+      "file": "META-INF/jars/xstream-1.4.21.jar"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.20.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21.11",
+    "java": ">=21"
+  }
+}

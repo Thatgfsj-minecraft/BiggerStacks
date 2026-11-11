@@ -3,12 +3,7 @@
   "minVersion": "0.8",
   "package": "portb.biggerstacks.mixin",
   "compatibilityLevel": "JAVA_21",
-  "plugin": "portb.biggerstacks.TransformerEngine",
   "mixins": [
-    "compat.sophisticatedcore.CookingLogicMixin",
-    "compat.sophisticatedcore.InventoryHandlerMixin",
-    "compat.sophisticatedcore.StackUpgradeItemMixin",
-    "compat.sophisticatedcore.StorageContainerMenuBaseMixin",
     "vanilla.AnvilMenuMixin",
     "vanilla.ContainerMixin",
     "vanilla.ContainersMixin",
@@ -18,7 +13,6 @@
     "vanilla.stacksize.BundleContentsMutableMixin",
     "vanilla.stacksize.ItemEntityMixin",
     "vanilla.stacksize.ItemMixin",
-    "vanilla.stacksize.ItemStackHandlerMixin",
     "vanilla.stacksize.ItemStackMixin"
   ],
   "client": [
