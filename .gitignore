@@ -119,3 +119,10 @@ gametestrun
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+
+# Vendored dependency jars must be tracked (the global *.jar rule ignores them)
+!libs/maven/**/*.jar
+
+# ModDevGradle run directories
+run/
+run-data/

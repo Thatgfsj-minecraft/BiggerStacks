@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>portb</groupId>
+  <artifactId>SimpleLoggerWrapper</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+  <name>SimpleLoggerWrapper</name>
+  <description>Vendored copy of the upstream PORTB library (source: https://codeberg.org/PORTB/SimpleLoggerWrapper), extracted from the BiggerStacks 1.20.1 release jar because the Codeberg Maven registry is not anonymously downloadable.</description>
+</project>

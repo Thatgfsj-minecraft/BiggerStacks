@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="GNU LGPLv3"
+
+[[mods]]
+modId="biggerstacks"
+version="${version}"
+displayName="Bigger Stacks"
+logoFile="BiggerStacks.png"
+authors="PORTB"
+description='''Allows increasing stack sizes past 64 up to MAXINT/2 (about 1 billion)'''
+
+[[dependencies.biggerstacks]]
+modId="neoforge"
+type="required"
+versionRange="[21.11.0,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.biggerstacks]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.11,1.21.12)"
+ordering="NONE"
+side="BOTH"
+
+[[mixins]]
+config="biggerstacks.mixins.json"
