@@ -44,6 +44,18 @@ neoForge {
 repositories {
     mavenCentral()
 
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter {
+            includeGroup 'maven.modrinth'
+        }
+    }
+
     // Vendored PORTB libraries. Upstream publishes these to https://codeberg.org/api/packages/PORTB/maven,
     // which cannot be downloaded anonymously, so the exact artifacts are extracted from the upstream
     // 1.20.1 release jar (META-INF/jarjar/) and kept in libs/maven.
@@ -63,6 +75,15 @@ dependencies {
         // The XML parser is not used, BiggerStacksConfigLib configures the STAX driver
         exclude group: 'io.github.x-stream', module: 'mxparser'
     }
+
+    // The XML based transformer engine used for third-party mod compatibility
+    jarJar(implementation('portb:BiggerStacksTransformerLib:2026.02.24')) {
+        version { strictly '[2026.02.24]' }
+    }
+
+    // Compat modules (compile against the target mods; they are supplied by the player at runtime)
+    implementation 'maven.modrinth:sophisticated-core:1.21.11-1.5.2.2348'
+    implementation 'maven.modrinth:sophisticated-backpacks:1.21.11-3.26.3.2168'
 }
 
 def modFullVersion = version.toString()

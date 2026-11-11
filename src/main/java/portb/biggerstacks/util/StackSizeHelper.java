@@ -49,6 +49,24 @@ public class StackSizeHelper
      *
      * @return The new stack size with a minimum value of 64
      */
+    /**
+     * Scales a capacity that is capped by {@code Item.ABSOLUTE_MAX_STACK_SIZE} (99 in 1.21.11).
+     * <p>
+     * NeoForge's transfer API caps handler capacities with {@code Math.min(itemMaxStackSize, 99)}.
+     * Since the item max stack size is already patched by BiggerStacks, a value of exactly 99 means
+     * "capped by the vanilla absolute limit" and can safely be replaced by the configured maximum.
+     */
+    public static int scaleTransferCapacity(int original)
+    {
+        if (original == 1)
+            return 1;
+
+        if (original == 64 || original == 99)
+            return getNewStackSize();
+
+        return original;
+    }
+
     public static int getNewStackSize()
     {
         return Math.max(StackSizeRules.getMaxStackSize(), StackSizeRules.getBaselineStackSize());

@@ -5,6 +5,10 @@
   "compatibilityLevel": "JAVA_21",
   "plugin": "portb.biggerstacks.TransformerEngine",
   "mixins": [
+    "compat.sophisticatedcore.CookingLogicMixin",
+    "compat.sophisticatedcore.InventoryHandlerMixin",
+    "compat.sophisticatedcore.StackUpgradeItemMixin",
+    "compat.sophisticatedcore.StorageContainerMenuBaseMixin",
     "vanilla.AnvilMenuMixin",
     "vanilla.ContainerMixin",
     "vanilla.ContainersMixin",
