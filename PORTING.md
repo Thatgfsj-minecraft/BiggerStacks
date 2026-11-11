@@ -64,6 +64,20 @@ JAVA_HOME=/path/to/jdk-21 ./gradlew build
 - [x] 大数量验证：`/summon ... {Item:{id:"minecraft:stone",count:2000}}` 生成、保存、重启后数量仍为 2000
 - [x] 规则集 XML 读取（1000）与 `/biggerstacks info` 生效
 
+## 兼容矩阵（Minecraft 1.21.11 × NeoForge）
+
+| 模组 | 1.21.11 构建 | 状态 | 说明 / 追踪 |
+|---|---|---|---|
+| Sophisticated Core / Backpacks | 有（core 1.5.2 / backpacks 3.26.3） | 进行中 | #4 |
+| Applied Energistics 2 | 无（1.21.x 止于 1.21.1，随后 26.x） | 阻塞 | #5 |
+| Refined Storage | 无（1.21.x 止于 1.21.1，随后 26.1.2） | 阻塞 | #6 |
+| Modular Routers | 无（有 1.21.8，之后 26.x） | 阻塞 | #7 |
+| Better Bundles | 无（停更于 1.20.1 Forge） | 不适用 | #8 |
+| NeoForge transfer API（通用） | 1.21.11 自带 | 已支持 | 通过 mixin/neoforge/transfer 放宽 Item.ABSOLUTE_MAX_STACK_SIZE 上限 |
+
+> 兼容策略：优先做**通用**的移植层（原版 Container/Slot、NeoForge transfer API），
+> 再为具体模组补 mixin / TransformerLib XML 变换器；没有 1.21.11 构建的模组不强行适配，避免不可验证的代码入库。
+
 ## 已知待办
 
 - [ ] 客户端 GUI 目检（`/biggerstacks quicksetup` 界面）

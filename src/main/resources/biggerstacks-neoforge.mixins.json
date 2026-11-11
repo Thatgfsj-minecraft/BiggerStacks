@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "portb.biggerstacks.mixin.neoforge",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "transfer.ItemAccessItemHandlerMixin",
+    "transfer.ItemStacksResourceHandlerMixin",
+    "transfer.ItemStackResourceHandlerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

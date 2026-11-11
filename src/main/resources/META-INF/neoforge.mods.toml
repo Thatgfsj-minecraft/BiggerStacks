@@ -26,3 +26,6 @@ side="BOTH"
 
 [[mixins]]
 config="biggerstacks.mixins.json"
+
+[[mixins]]
+config="biggerstacks-neoforge.mixins.json"
