@@ -56,9 +56,18 @@ JAVA_HOME=/path/to/jdk-21 ./gradlew build
    `TransformerEngine` 依赖 ModLauncher 内部字段，见下）。`TransformerEngine` 保留 mixin 插件骨架，
    以后恢复兼容模块时按当前 ModLauncher API 重新实现。
 
+## 已验证
+
+- [x] `./gradlew build` 通过（Java 21 / Gradle 9.5.1）
+- [x] 开发环境 `runServer` 启动到 Done，无 mixin 报错
+- [x] 生产环境：NeoForge 21.11.45 独立服务器 + jar-in-jar 打包后的 jar 启动成功，内嵌库正常加载
+- [x] 大数量验证：`/summon ... {Item:{id:"minecraft:stone",count:2000}}` 生成、保存、重启后数量仍为 2000
+- [x] 规则集 XML 读取（1000）与 `/biggerstacks info` 生效
+
 ## 已知待办
 
-- [ ] 运行时冒烟（`runServer` 到 Done + 基本堆叠行为）
+- [ ] 客户端 GUI 目检（`/biggerstacks quicksetup` 界面）
+- [ ] 容器/槽位极限的完整 E2E（需要玩家客户端）
 - [ ] 兼容模块恢复（等待目标模组发布 1.21.11 构建）
 - [ ] `TransformerLib` / ModLauncher launch plugin 的 1.21.11 实现
 - [ ] CI（构建阶段启用，组织约定不在每个 PR 跑 CI）
