@@ -17,3 +17,5 @@ pluginManagement {
 }
 
 rootProject.name = "biggerstacks-1.21.11"
+
+include ':coremod'

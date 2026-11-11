@@ -30,6 +30,24 @@ JAVA_HOME=/path/to/jdk-21 ./gradlew build
 2. 在游戏内运行 `/biggerstacks quicksetup` 调整三种堆叠档位，或直接编辑
    `config/biggerstacks-rules.xml`。
 
+
+## 兼容模块（1.21.11 / NeoForge）
+
+| 模组 | 状态 |
+|---|---|
+| Sophisticated Core / Backpacks | ✅ 已支持（mixin + XML 变换） |
+| Applied Energistics 2 | ⛔ 阻塞（上游无 1.21.11 构建，见 #5） |
+| Refined Storage | ⛔ 阻塞（上游无 1.21.11 构建，见 #6） |
+| Modular Routers | ⛔ 阻塞（上游无 1.21.11 构建，见 #7） |
+| Better Bundles | ➖ 不适用（原版 bundle 已由本模组处理，见 #8） |
+| NeoForge transfer API（通用） | ✅ 已支持（槽位容量上限已放宽） |
+
+详细兼容矩阵与移植说明见 [PORTING.md](./PORTING.md)；兼容相关 issue 见 [milestone 1.21.11 兼容与首发](https://github.com/Thatgfsj-minecraft/BiggerStacks/milestone/1)。
+
+## 仓库与流程
+
+- 仓库由 `Thatgfsj-minecraft` 组织维护；上游同步走 `upstream`（Codeberg）remote。
+- 改动遵循 issue + PR 流程；CI 在构建阶段启用（#11）。
 ## 许可与致谢
 
 - 上游代码版权归 PORTB 所有，按 GNU LGPL v3 发布；本 fork 保持同一协议并保留原始版权声明。

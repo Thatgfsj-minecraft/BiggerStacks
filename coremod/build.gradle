@@ -1,0 +1,103 @@
+/*
+ * Copyright (c) PORTB 2025
+ *
+ * Licensed under GNU LGPL v3
+ * https://www.gnu.org/licenses/lgpl-3.0.txt
+ */
+
+/*
+ * The FancyModLoader 10 class processors of BiggerStacks.
+ *
+ * They are packaged separately from the main mod because FML only discovers
+ * ClassProcessorProvider implementations on the plugin layer. This jar is
+ * embedded into the mod jar as a jar-in-jar library (FMLModType: LIBRARY),
+ * which puts it on the plugin layer classpath at launch time.
+ *
+ * Keep this project free of game layer (Minecraft/mod) types: it is loaded
+ * before the game layer exists. The stack size supplier is injected by the
+ * main mod (TransformerEngine) at runtime.
+ */
+
+plugins {
+    id 'java-library'
+}
+
+group = 'portb'
+version = rootProject.version
+
+repositories {
+    mavenCentral()
+
+    maven {
+        name = 'NeoForged'
+        url = 'https://maven.neoforged.net/releases'
+    }
+
+    // Transitive dependencies of the FancyModLoader API
+    maven {
+        name = 'Mojang Libraries'
+        url = 'https://libraries.minecraft.net'
+    }
+
+    // Vendored PORTB libraries (same local maven repository as the main project)
+    maven {
+        url = rootProject.file('libs/maven')
+    }
+}
+
+dependencies {
+    // Provided by the FancyModLoader plugin layer at runtime
+    compileOnly 'net.neoforged.fancymodloader:loader:10.0.36'
+    compileOnly 'org.ow2.asm:asm-tree:9.8'
+    compileOnly 'org.ow2.asm:asm:9.8'
+    compileOnly 'org.slf4j:slf4j-api:2.0.16'
+
+    // Shaded into this jar: the plugin layer cannot see classes from the mod jar
+    implementation 'portb:BiggerStacksTransformerLib:2026.02.24'
+    implementation 'portb:SimpleLoggerWrapper:1.0'
+    implementation('com.thoughtworks.xstream:xstream:1.4.21') {
+        exclude group: 'io.github.x-stream', module: 'mxparser'
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+def transformersDir = rootProject.file('src/main/resources/transformers')
+
+jar {
+    archiveBaseName = 'biggerstacks-coremod'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // Embed the transformer library and its dependencies so the plugin layer is self contained
+    from({
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }) {
+        exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'module-info.class'
+        exclude 'META-INF/versions/**'
+    }
+
+    // The XML definitions live in the main project (single source of truth); copy them in
+    from(transformersDir) {
+        into 'transformers'
+    }
+
+    manifest {
+        attributes(
+                'FMLModType': 'LIBRARY',
+                'Automatic-Module-Name': 'portb.biggerstacks.coremod',
+                'Specification-Title': 'biggerstacks-coremod',
+                'Implementation-Version': project.version
+        )
+    }
+}
