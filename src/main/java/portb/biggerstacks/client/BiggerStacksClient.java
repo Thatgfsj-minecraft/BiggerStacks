@@ -9,6 +9,7 @@ package portb.biggerstacks.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import portb.biggerstacks.config.ClientConfig;
+import portb.biggerstacks.event.ClientEvents;
 
 public class BiggerStacksClient implements ClientModInitializer
 {
@@ -16,5 +17,6 @@ public class BiggerStacksClient implements ClientModInitializer
     public void onInitializeClient()
     {
         ClientConfig.load();
+        ClientEvents.register();
     }
 }
