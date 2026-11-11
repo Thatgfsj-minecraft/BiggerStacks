@@ -7,21 +7,34 @@
 
 package portb.biggerstacks.event;
 
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import portb.biggerstacks.Constants;
 import portb.biggerstacks.net.PacketHandler;
+import portb.biggerstacks.net.RulesetSyncTask;
+import portb.biggerstacks.net.ClientboundRulesHandshakePacket;
 
-@Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public class CommonModEvents
 {
     /**
-     * Registers network packets
+     * Registers network packets.
      */
     @SubscribeEvent
-    public static void serverStarting(FMLCommonSetupEvent event)
+    public static void registerPayloads(RegisterPayloadHandlersEvent event)
     {
-        PacketHandler.register();
+        PacketHandler.register(event);
+    }
+    
+    @SubscribeEvent
+    public static void registerConfigurationTasks(RegisterConfigurationTasksEvent event)
+    {
+        var listener = event.getListener();
+        if (listener.hasChannel(ClientboundRulesHandshakePacket.TYPE))
+        {
+            event.register(new RulesetSyncTask(listener));
+        }
     }
 }

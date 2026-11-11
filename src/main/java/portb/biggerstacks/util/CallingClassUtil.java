@@ -15,12 +15,10 @@ public class CallingClassUtil
         {
             String className = element.getClassName();
             if (!className.startsWith("net.minecraft") && !className.startsWith("java.lang.Thread") &&
-                    !className.startsWith("portb"))
-            {
+                        !className.startsWith("portb"))
                 return className + " [" + element.getFileName() + ":" + element.getLineNumber() + "]";
-            }
         }
-
+        
         return null;
     }
 }

@@ -17,14 +17,11 @@ import portb.biggerstacks.util.ItemStackSizeHelper;
 @Mixin(Item.class)
 public class ItemMixin
 {
-    /**
-     * Increases the maximum stack size
-     */
-    @Inject(method = "getMaxStackSize",
+    @Inject(method = "getDefaultMaxStackSize",
             at = @At("RETURN"),
             cancellable = true)
     private void increaseStackLimit(CallbackInfoReturnable<Integer> returnInfo)
     {
-        ItemStackSizeHelper.applyStackSizeToItem(((Item) (Object) this), returnInfo);
+        ItemStackSizeHelper.applyStackSizeToItem(((Item) (Object) this).getDefaultInstance(), returnInfo);
     }
 }

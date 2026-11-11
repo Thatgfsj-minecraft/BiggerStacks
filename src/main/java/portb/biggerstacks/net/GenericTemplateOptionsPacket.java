@@ -16,12 +16,12 @@ public class GenericTemplateOptionsPacket extends TemplateOptions
     {
         super(normalStackLimit, potionsStackLimit, enchantedBooksStackLimit);
     }
-
+    
     public GenericTemplateOptionsPacket(FriendlyByteBuf buf)
     {
         super(buf.readInt(), buf.readInt(), buf.readInt());
     }
-
+    
     public void encode(FriendlyByteBuf buf)
     {
         buf.writeInt(getNormalStackLimit());

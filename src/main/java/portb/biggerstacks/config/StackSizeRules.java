@@ -7,16 +7,19 @@
 
 package portb.biggerstacks.config;
 
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import portb.biggerstacks.util.ItemStackSizeHelper;
+import portb.biggerstacks.BiggerStacks;
 import portb.configlib.xml.RuleSet;
 
 public class StackSizeRules
 {
+    private static final int ABSOLUTE_MAX_STACK_SIZE = 1_073_741_823;
+    private static boolean clampWarningLogged = false;
+
     /**
-     * Tracks the maximum stack size from registered item (see {@link portb.biggerstacks.mixin.vanilla.ItemPropertiesMixin#recordMaxRegisteredItemStackSize(int, CallbackInfoReturnable)} (int, CallbackInfoReturnable)})
+     * Tracks the maximum stack size from registered items (see
+     * {@link portb.biggerstacks.mixin.vanilla.ItemPropertiesMixin}).
      */
-    public static int maxRegisteredItemStackSize = 64; //start at 64 because items that want to stack to 64 don't have to call Item.Property.stacksTo() to set its stack size
+    public static int maxRegisteredItemStackSize = 64;
 
     /**
      * The global ruleset that is either received from the server or read from the config file
@@ -31,18 +34,39 @@ public class StackSizeRules
     public static void setRuleSet(RuleSet ruleSet)
     {
         StackSizeRules.ruleSet = ruleSet;
-        ItemStackSizeHelper.resetCache();
+
+        if (ruleSet != null)
+            BiggerStacks.LOGGER.info("Loaded BiggerStacks ruleset. Max declared stack size: {}", ruleSet.getMaxStacksize());
+        else
+            BiggerStacks.LOGGER.warn("Stack size ruleset reset to null; falling back to defaults.");
     }
 
     public static int getMaxStackSize()
     {
+        int configuredMax = maxRegisteredItemStackSize;
         if (ruleSet != null)
+            configuredMax = Math.max(ruleSet.getMaxStacksize(), maxRegisteredItemStackSize);
+
+        return clampStackSize(configuredMax);
+    }
+
+    public static int getBaselineStackSize()
+    {
+        return Math.max(64, Math.min(maxRegisteredItemStackSize, ABSOLUTE_MAX_STACK_SIZE));
+    }
+
+    public static int clampStackSize(int requestedSize)
+    {
+        if (requestedSize > ABSOLUTE_MAX_STACK_SIZE)
         {
-            return Math.max(ruleSet.getMaxStacksize(), maxRegisteredItemStackSize);
+            if (!clampWarningLogged)
+            {
+                BiggerStacks.LOGGER.warn("Requested stack size {} exceeds hard cap of {}; larger values will be clamped.",
+                        requestedSize, ABSOLUTE_MAX_STACK_SIZE);
+                clampWarningLogged = true;
+            }
+            return ABSOLUTE_MAX_STACK_SIZE;
         }
-        else
-        {
-            return maxRegisteredItemStackSize;
-        }
+        return requestedSize;
     }
 }

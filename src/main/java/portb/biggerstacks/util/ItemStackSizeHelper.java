@@ -7,17 +7,18 @@
 
 package portb.biggerstacks.util;
 
-import com.mojang.logging.LogUtils;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
-import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import portb.biggerstacks.BiggerStacks;
+import portb.biggerstacks.Constants;
 import portb.biggerstacks.config.StackSizeRules;
 import portb.configlib.ItemProperties;
 import portb.configlib.TagAccessor;
@@ -27,7 +28,6 @@ import java.util.Map;
 
 public class ItemStackSizeHelper
 {
-    private final static Logger LOGGER = LogUtils.getLogger();
     private static final Map<Item, Integer> itemStackSizeCache = new HashMap<>();
 
     public static void applyStackSizeToItem(Item item, CallbackInfoReturnable<Integer> returnInfo)
@@ -37,7 +37,7 @@ public class ItemStackSizeHelper
         {
             var cached = itemStackSizeCache.get(item);
 
-            // If the cached value is null, we must use the original return value See the ifPresentOrElse below
+            // If the cached value is null, we must use the original return value
             if (cached != null)
             {
                 returnInfo.cancel();
@@ -47,7 +47,6 @@ public class ItemStackSizeHelper
             return;
         }
 
-        // If we don't know, then get the default item instance and calculate the stack size
         applyStackSizeToItem(item.getDefaultInstance(), item, returnInfo);
     }
 
@@ -61,16 +60,13 @@ public class ItemStackSizeHelper
         if (StackSizeRules.getRuleSet() != null)
         {
             if (item == null)
-            {
                 item = itemstack.getItem();
-            }
 
-            // Check if we already determined what size this item has, to avoid doing expensive lookups and shit
+            // Check if we already determined what size this item has, to avoid doing expensive lookups
             if (itemStackSizeCache.containsKey(item))
             {
                 var cached = itemStackSizeCache.get(item);
 
-                // If the cached value is null, we must use the original return value. See the ifPresentOrElse below
                 if (cached != null)
                 {
                     returnInfo.cancel();
@@ -80,48 +76,53 @@ public class ItemStackSizeHelper
                 return;
             }
 
-            var itemKey = ForgeRegistries.ITEMS.getKey(item);
+            var itemKey = BuiltInRegistries.ITEM.getKey(item);
+            var namespace = itemKey != null ? itemKey.getNamespace() : Constants.MOD_ID;
+            var identifier = itemKey != null ? itemKey.toString() : item.getClass().getName();
+            boolean isEdible = item.components().has(DataComponents.FOOD);
+            boolean isPlaceable = item instanceof BlockItem;
+            boolean isDamageable = itemstack.isDamageableItem();
+            boolean isBucket = item instanceof BucketItem;
+            int currentMaxStack = returnInfo.getReturnValue();
+
             final var itemFinal = item; // Needed because java wants a final reference to pass into the lambda
 
             StackSizeRules.getRuleSet()
                     .determineStackSizeForItem(
-                        new ItemProperties(
-                                itemKey.getNamespace(),
-                                itemKey.toString(),
-                                returnInfo.getReturnValue(),
-                                item.isEdible(),
-                                (item instanceof BlockItem),
-                                item.canBeDepleted(),
-                                item instanceof BucketItem,
-                                new TagAccessorImpl(itemstack),
-                                item.getClass()
-                        )
+                            new ItemProperties(
+                                    namespace,
+                                    identifier,
+                                    currentMaxStack,
+                                    isEdible,
+                                    isPlaceable,
+                                    isDamageable,
+                                    isBucket,
+                                    new TagAccessorImpl(itemstack),
+                                    item.getClass()
+                            )
                     )
                     .ifPresentOrElse(
                             (stackSize) ->
                             {
-                                // If we found a match, put it in the cache
+                                int clamped = StackSizeRules.clampStackSize(stackSize);
                                 returnInfo.cancel();
-                                returnInfo.setReturnValue(stackSize);
-                                itemStackSizeCache.put(itemFinal, stackSize);
+                                returnInfo.setReturnValue(clamped);
+                                itemStackSizeCache.put(itemFinal, clamped);
                             },
-                            // If there was no matching rule for this item, indicate that we should use the original
-                            // return value instead of using a cached value. This is intended to prevent items, which
-                            // somehow use their NBT to determine what their stack size should be, from having their
-                            // stack size for every 'item' (again, indicated by their NBT) incorrectly set to whatever
-                            // value is seen first. Since this mod does not support matching items by NBT, this is okay.
-                            // See https://codeberg.org/PORTB/BiggerStacks/issues/82#issuecomment-10939013
+                            // No matching rule: remember that this item uses its default value, so that
+                            // items whose stack size depends on their components/NBT are not cached wrongly.
                             () -> itemStackSizeCache.put(itemFinal, null)
                     );
         }
         else
         {
-            LOGGER.debug("Stack size ruleset is somehow null, using fallback logic. Called from {}", CallingClassUtil.getCallerClassName());
+            BiggerStacks.LOGGER.debug("Stack size ruleset is somehow null, using fallback logic. Called from {}",
+                    CallingClassUtil.getCallerClassName());
 
             if (returnInfo.getReturnValue() > 1)
             {
                 returnInfo.cancel();
-                returnInfo.setReturnValue(SlotLimitHelper.getNewStackSize());
+                returnInfo.setReturnValue(StackSizeHelper.getNewStackSize());
             }
         }
     }
@@ -136,7 +137,8 @@ public class ItemStackSizeHelper
         @Override
         public boolean doesItemHaveTag(String tag)
         {
-            return item.is(new TagKey<>(Registries.ITEM, new ResourceLocation(tag)));
+            Identifier tagId = Identifier.parse(tag);
+            return item.is(TagKey.create(Registries.ITEM, tagId));
         }
     }
 }

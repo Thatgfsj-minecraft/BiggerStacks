@@ -7,31 +7,37 @@
 
 package portb.biggerstacks.net;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import portb.biggerstacks.Constants;
 import portb.configlib.xml.RuleSet;
 
 /**
- * Packet sent to clients when the config file is updated
+ * Packet sent to clients when the config file is updated.
  */
-public record ClientboundRulesUpdatePacket(RuleSet rules)
+public record ClientboundRulesUpdatePacket(RuleSet rules) implements CustomPacketPayload
 {
-    /**
-     * Used for play to client
-     */
-    public ClientboundRulesUpdatePacket
+    public static final Type<ClientboundRulesUpdatePacket>                                 TYPE         = new Type<>(
+            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "rules_update"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundRulesUpdatePacket> STREAM_CODEC = StreamCodec.of(
+            ClientboundRulesUpdatePacket::write,
+            ClientboundRulesUpdatePacket::read);
+    
+    private static ClientboundRulesUpdatePacket read(RegistryFriendlyByteBuf buf)
     {
+        return new ClientboundRulesUpdatePacket(RuleSet.fromBytes(buf.readByteArray()));
     }
-
-    /**
-     * Decodes a packet from a byte buffer
-     */
-    public ClientboundRulesUpdatePacket(FriendlyByteBuf buf)
+    
+    private static void write(RegistryFriendlyByteBuf buf, ClientboundRulesUpdatePacket packet)
     {
-        this(RuleSet.fromBytes(buf.readByteArray()));
+        buf.writeByteArray(packet.rules().toBytes());
     }
-
-    public void encode(FriendlyByteBuf buf)
+    
+    @Override
+    public Type<ClientboundRulesUpdatePacket> type()
     {
-        buf.writeByteArray(rules.toBytes());
+        return TYPE;
     }
 }
