@@ -68,15 +68,31 @@ JAVA_HOME=/path/to/jdk-21 ./gradlew build
 
 | 模组 | 1.21.11 构建 | 状态 | 说明 / 追踪 |
 |---|---|---|---|
-| Sophisticated Core / Backpacks | 有（core 1.5.2 / backpacks 3.26.3） | 进行中 | #4 |
+| Sophisticated Core / Backpacks | 有（core 1.5.2 / backpacks 3.26.3） | 已支持 | #4（mixin + XML 变换，已做开发/生产服验证） |
 | Applied Energistics 2 | 无（1.21.x 止于 1.21.1，随后 26.x） | 阻塞 | #5 |
 | Refined Storage | 无（1.21.x 止于 1.21.1，随后 26.1.2） | 阻塞 | #6 |
 | Modular Routers | 无（有 1.21.8，之后 26.x） | 阻塞 | #7 |
 | Better Bundles | 无（停更于 1.20.1 Forge） | 不适用 | #8 |
 | NeoForge transfer API（通用） | 1.21.11 自带 | 已支持 | 通过 mixin/neoforge/transfer 放宽 Item.ABSOLUTE_MAX_STACK_SIZE 上限 |
+| TransformerLib XML 变换器引擎 | 本仓库实现 | 已支持 | 通过 FML 10 ClassProcessor + FMLModType: LIBRARY 子包实现，见下文 |
 
 > 兼容策略：优先做**通用**的移植层（原版 Container/Slot、NeoForge transfer API），
 > 再为具体模组补 mixin / TransformerLib XML 变换器；没有 1.21.11 构建的模组不强行适配，避免不可验证的代码入库。
+
+## 兼容引擎（NeoForge 21.11 / FancyModLoader 10）
+
+上游 1.20.1 通过反射往 ModLauncher 注入 ILaunchPluginService 来跑 XML 定义的运行期 ASM 变换；NeoForge 21.11 已改用
+FancyModLoader 的 ClassProcessor 机制，本分支做了对应实现：
+
+- coremod/ 子项目编译 portb.biggerstacks.coremod（Provider + Processor + Bootstrap + TargetIndex），
+  通过 META-INF/services/net.neoforged.neoforgespi.transformation.ClassProcessorProvider 注册；
+- 子项目打成 FMLModType: LIBRARY 的 plugin jar（内嵌 TransformerLib / SLW / xstream 与 transformers/*.xml），
+  再由主 mod 通过 jar-in-jar 嵌进发布 jar —— FML 只会在 plugin 层扫描 provider，这是 production 生效的必要条件；
+- 主 mod 的 TransformerEngine 只保留 mixin plugin 逻辑，并向 coremod 注入全局堆叠上限 supplier；
+- 变换器在 mixin 之后运行，XML 规则看到的是 mixin 处理后的字节码。
+
+> 已知上游 bug：TransformerLib.loadTransformers 用 getResourceAsStream("/" + entry) 读资源，dev/prod 都会返回 null；
+> coremod 里已用合并 XML 的方式兜底（TransformerLib.loadTransformersFromXML），建议反馈上游修正。
 
 ## 已知待办
 

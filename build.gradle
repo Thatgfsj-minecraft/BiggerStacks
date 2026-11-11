@@ -76,10 +76,14 @@ dependencies {
         exclude group: 'io.github.x-stream', module: 'mxparser'
     }
 
-    // The XML based transformer engine used for third-party mod compatibility
-    jarJar(implementation('portb:BiggerStacksTransformerLib:2026.02.24')) {
-        version { strictly '[2026.02.24]' }
-    }
+    // The XML based transformer engine used for third-party mod compatibility.
+    // Not bundled in this jar: it is shaded into the coremod plugin jar below (single copy, plugin layer),
+    // which is embedded through jar-in-jar so both layers share the same TransformerLib classes.
+    implementation 'portb:BiggerStacksTransformerLib:2026.02.24'
+
+    // FancyModLoader class processors (plugin layer, FMLModType: LIBRARY), embedded via jar-in-jar
+    implementation project(':coremod')
+    jarJar project(':coremod')
 
     // Compat modules (compile against the target mods; they are supplied by the player at runtime)
     implementation 'maven.modrinth:sophisticated-core:1.21.11-1.5.2.2348'

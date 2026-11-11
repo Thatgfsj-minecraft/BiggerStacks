@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import portb.biggerstacks.config.StackSizeRules;
+import portb.biggerstacks.coremod.TransformerLibBootstrap;
 
 import java.util.List;
 import java.util.Map;
@@ -26,10 +28,12 @@ import java.util.regex.Pattern;
  * Vanilla patches are always applied. Compatibility patches under
  * {@code portb.biggerstacks.mixin.compat.<modid>.*} are only applied when the target mod is installed.
  * <p>
- * NOTE: The 1.20.1/1.21.1 versions of BiggerStacks also injected an ILaunchPluginService here to run
- * the XML based TransformerLib patches for third-party mods. That machinery is deliberately not part
- * of the 1.21.11 core port yet; when compatibility modules are restored the transformer engine has to
- * be re-implemented against the current ModLauncher API (or replaced by regular mixins).
+ * The 1.20.1 version of this class also injected an {@code ILaunchPluginService} into ModLauncher through reflection
+ * to run the XML based TransformerLib patches for third party mods. ModLauncher is gone in NeoForge 21.11 /
+ * FancyModLoader 10, so those patches are now applied by a {@code ClassProcessor} implemented in
+ * {@link portb.biggerstacks.coremod}. The static initialiser below keeps the two parts that have to run in the game
+ * layer: loading the XML definitions (they live in the mod jar) and teaching the transformer library how to query the
+ * current maximum stack size.
  */
 public class TransformerEngine implements IMixinConfigPlugin
 {
@@ -39,6 +43,21 @@ public class TransformerEngine implements IMixinConfigPlugin
     private static final Logger LOGGER = LoggerFactory.getLogger(TransformerEngine.class);
     private static final Pattern MOD_ID_PACKAGE_TARGET_PATTERN = Pattern.compile(
             "mixin\\.compat\\.([^.]+)\\.[^.]+$");
+
+    static
+    {
+        // The mixin plugin is the earliest game layer entry point, so this is where the XML transformer definitions
+        // are loaded. This is idempotent: when the class processor is already linked it will have done this before.
+        TransformerLibBootstrap.initialize(TransformerEngine.class);
+
+        // The library needs to know how to get the maximum stack size. This must happen from the game layer because
+        // StackSizeRules reads the ruleset that is synced from the server / read from the config file.
+        TransformerLibBootstrap.setGlobalStackSizeSupplier(StackSizeRules::getMaxStackSize);
+
+        LOGGER.info("XML transformer engine {}", TransformerLibBootstrap.isReady()
+                ? "is active"
+                : "is NOT active, XML based compatibility patches are disabled");
+    }
 
     private static boolean isModLoaded(String modId)
     {

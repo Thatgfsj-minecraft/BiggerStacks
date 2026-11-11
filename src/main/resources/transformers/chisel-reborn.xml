@@ -1,0 +1,23 @@
+<!--
+  ~ Copyright (c) PORTB 2026
+  ~
+  ~ Licensed under GNU LGPL v3
+  ~ https://www.gnu.org/licenses/lgpl-3.0.txt
+  -->
+
+<!-- Removes various stack "validity" checks -->
+<transformers>
+    <class path="com.periut.chisel.gui.ChiselScreenHandler" transformChildren="false">
+        <method name="quickMoveStack" transformer="replaceInt" target="99" replacement="2147483647"/>
+        <method name="m_7648_" transformer="replaceInt" target="99" replacement="2147483647"/>
+    </class>
+    <class path="com.periut.chisel.inventory.ChiselInventory" transformChildren="false">
+        <method name="removeItem" transformer="replaceInt" target="99" replacement="2147483647"/>
+        <method name="m_7407_" transformer="replaceInt" target="99" replacement="2147483647"/>
+
+        <method name="setItem" transformer="replaceInt" target="99" replacement="2147483647"/>
+        <method name="m_6836_" transformer="replaceInt" target="99" replacement="2147483647"/>
+
+        <method name="populate" transformer="replaceInt" target="99" replacement="2147483647"/>
+    </class>
+</transformers>
