@@ -51,13 +51,13 @@ public abstract class ItemRendererMixin
         }
 
         //counts that fit the vanilla layout and are not shortened are left alone
-        if (stack.getCount() < ONE_THOUSAND && !ClientConfig.enableNumberShortening.get())
+        if (stack.getCount() < ONE_THOUSAND && !ClientConfig.enableNumberShortening)
             return;
 
         String text = alternateCount != null ? alternateCount : getStringForBigStackCount(stack.getCount());
 
         double scale = calculateStringScale(font, text);
-        if (scale >= 1.0 && !ClientConfig.enableNumberShortening.get())
+        if (scale >= 1.0 && !ClientConfig.enableNumberShortening)
             return;
 
         GuiGraphics graphics = (GuiGraphics) (Object) this;
@@ -75,7 +75,7 @@ public abstract class ItemRendererMixin
 
     private static String getStringForBigStackCount(int count)
     {
-        if (ClientConfig.enableNumberShortening.get())
+        if (ClientConfig.enableNumberShortening)
         {
             double value = count;
 

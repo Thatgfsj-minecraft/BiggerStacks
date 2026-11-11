@@ -6,95 +6,64 @@
  */
 
 plugins {
-    id 'java-library'
-    id 'net.neoforged.moddev' version '2.0.147'
+    id 'fabric-loom' version '1.17.21'
 }
 
-version = "${minecraftVersion}-${modVersion}"
+version = "${minecraft_version}-${mod_version}"
 group = 'portb'
-base { archivesName = 'biggerstacks' }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-neoForge {
-    version = project.neoforgeVersion
-    validateAccessTransformers = true
-
-    runs {
-        client { client() }
-        server {
-            server()
-            programArguments.addAll '--nogui'
-        }
-        data { data() }
-        gameTestServer { type = "gameTestServer" }
-    }
-
-    mods {
-        biggerstacks {
-            sourceSet sourceSets.main
-        }
-    }
+base {
+    archivesName = 'biggerstacks-fabric'
 }
 
 repositories {
     mavenCentral()
 
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = 'Modrinth'
-                url = 'https://api.modrinth.com/maven'
-            }
-        }
-        filter {
-            includeGroup 'maven.modrinth'
-        }
-    }
-
-    // Vendored PORTB libraries. Upstream publishes these to https://codeberg.org/api/packages/PORTB/maven,
-    // which cannot be downloaded anonymously, so the exact artifacts are extracted from the upstream
-    // 1.20.1 release jar (META-INF/jarjar/) and kept in libs/maven.
+    // Vendored PORTB libraries (same local maven repository as the NeoForge branch)
     maven { url = uri("libs/maven") }
 }
 
+loom {
+    runs {
+        client {
+            client()
+            programArguments.addAll '--username', 'Dev###'
+        }
+        server {
+            server()
+            programArguments.addAll '--nogui'
+        }
+    }
+}
+
 dependencies {
-    // Embedded at build time (jar-in-jar), the mod has no external dependencies at runtime
-    jarJar(implementation('portb:BiggerStacksConfigLib:2026.02.25')) {
-        version { strictly '[2026.02.25]' }
-    }
-    jarJar(implementation('portb:SimpleLoggerWrapper:1.0')) {
-        version { strictly '[1.0]' }
-    }
-    jarJar(implementation('com.thoughtworks.xstream:xstream:1.4.21')) {
-        version { strictly '[1.4.21]' }
-        // The XML parser is not used, BiggerStacksConfigLib configures the STAX driver
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.officialMojangMappings()
+
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+
+    // Bundled at runtime through src/main/resources/META-INF/jars + fabric.mod.json "jars"
+    implementation 'portb:BiggerStacksConfigLib:2026.02.25'
+    implementation 'portb:SimpleLoggerWrapper:1.0'
+    implementation('com.thoughtworks.xstream:xstream:1.4.21') {
         exclude group: 'io.github.x-stream', module: 'mxparser'
     }
+}
 
-    // The XML based transformer engine used for third-party mod compatibility.
-    // Not bundled in this jar: it is shaded into the coremod plugin jar below (single copy, plugin layer),
-    // which is embedded through jar-in-jar so both layers share the same TransformerLib classes.
-    implementation 'portb:BiggerStacksTransformerLib:2026.02.24'
-
-    // FancyModLoader class processors (plugin layer, FMLModType: LIBRARY), embedded via jar-in-jar
-    implementation project(':coremod')
-    jarJar project(':coremod')
-
-    // Compat modules (compile against the target mods; they are supplied by the player at runtime)
-    implementation 'maven.modrinth:sophisticated-core:1.21.11-1.5.2.2348'
-    implementation 'maven.modrinth:sophisticated-backpacks:1.21.11-3.26.3.2168'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 def modFullVersion = version.toString()
 
 processResources {
     inputs.property 'version', modFullVersion
-    filesMatching('META-INF/neoforge.mods.toml') {
+    filesMatching('fabric.mod.json') {
         expand 'version': modFullVersion
     }
 }
@@ -102,8 +71,4 @@ processResources {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.release = 21
-}
-
-tasks.withType(Javadoc).configureEach {
-    options.encoding = "UTF-8"
 }
