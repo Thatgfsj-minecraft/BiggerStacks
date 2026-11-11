@@ -1,0 +1,41 @@
+<!--
+  ~ Copyright (c) PORTB 2024
+  ~
+  ~ Licensed under GNU LGPL v3
+  ~ https://www.gnu.org/licenses/lgpl-3.0.txt
+  -->
+<!--
+  Sophisticated Core compatibility for Minecraft 1.21.11 / NeoForge 21.11.
+
+  1.21.11 moved the mod to the NeoForge transfer API: InventoryHandler extends ItemStacksResourceHandler, the slot
+  limit of a normal slot is derived from the item's maximum stack size and the stack upgrade multiplier is expressed
+  relative to the vanilla base slot limit of 64, cancelling out again in InventoryHandler#getBaseCapacity. The 1.20.1
+  file replaced exactly those 64 constants with the configured maximum stack size; doing that on 1.21.11 would
+  multiply the already raised item stack size a second time and is therefore wrong. The corresponding entries were
+  dropped:
+
+  - InventoryHandler#getBaseStackLimit / #setBaseSlotLimit: getBaseStackLimit no longer exists, setBaseSlotLimit now
+    stores a 64 based multiplier (see InventoryHandlerMixin, which handles the remaining empty-resource capacity).
+  - StackUpgradeItem#*: the 64.0 constants are the base the InventoryHandler divides by again, they must stay 64
+    (StackUpgradeItemMixin only clamps the result).
+  - InventoryHelper#getAnalogOutputSignal: the former lambda is now a normal method and uses a 64.0F *float*
+    constant, which replace64D never matched; the formula is self consistent with the 64 based slot limit.
+  - CookingLogic#canSmelt: the hardcoded vanilla limit is 99 in 1.21.11, not 64, so it cannot be expressed with
+    replace64/replace64D; it is handled by CookingLogicMixin instead.
+  - NoopStorageWrapper#getInventoryHandler: the 64 moved into a lambda and must stay 64 based as well.
+
+  What is left are the places where 64 is still the plain vanilla maximum stack size:
+  - the client side quick craft preview uses 64 for an empty slot, and
+  - StorageContainerMenuBase#mergeItemStack checks whether a slot accepts stacks above the vanilla maximum.
+-->
+<transformers>
+    <class path="net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase" transformChildren="false">
+        <method name="renderSlot" transformer="replace64"
+                desc="(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/inventory/Slot;II)V"/>
+    </class>
+
+    <class path="net.p3pp3rf1y.sophisticatedcore.common.gui.StorageContainerMenuBase" transformChildren="false">
+        <method name="mergeItemStack" transformer="replace64"
+                desc="(Lnet/minecraft/world/item/ItemStack;IIZZZ)Lnet/minecraft/world/item/ItemStack;"/>
+    </class>
+</transformers>
