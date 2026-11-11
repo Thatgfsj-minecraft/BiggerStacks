@@ -16,7 +16,7 @@
 | 项 | 值 |
 |---|---|
 | Minecraft | 1.21.11 |
-| Loader | Fabric Loader 0.20.1 |
+| Loader | Fabric Loader >=0.18.0（0.18.4 实测可加载；推荐最新稳定版 0.20.1） |
 | API | Fabric API 0.141.6+1.21.11 |
 | 映射 | Mojang official（Loom `officialMojangMappings`） |
 | Java | 21 |
@@ -58,6 +58,7 @@ JAVA_HOME=/path/to/jdk-21 ./gradlew build
 - [x] 规则集 XML 读取（`Loaded BiggerStacks ruleset. Max declared stack size: 1000`）
 - [x] `/biggerstacks info` 返回 1000；`summon ... count:2000` 生成后数据为 2000（大数量 codec 通过）
 - [x] 服务端命令、RCON、保存/停止正常
+- [x] Fabric Loader **0.18.4** 下开发服可加载并到 Done（依赖下限已放宽到 0.18.0）
 
 ## 已知待办
 
