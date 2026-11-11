@@ -5,223 +5,75 @@
  * https://www.gnu.org/licenses/lgpl-3.0.txt
  */
 
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-        maven { url = 'https://maven.parchmentmc.org' }
-        mavenCentral()
-        mavenLocal()
-    }
-    dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:5.1.+"
-        classpath 'org.parchmentmc:librarian:1.+'
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-    }
-}
-
 plugins {
-    id 'eclipse'
-    id 'maven-publish'
-    id "com.modrinth.minotaur" version "2.+"
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.147'
 }
 
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'org.spongepowered.mixin'
-
-version = "$minecraftVersion-$modVersion"
+version = "${minecraftVersion}-${modVersion}"
 group = 'portb'
-archivesBaseName = 'biggerstacks'
+base { archivesName = 'biggerstacks' }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-
-minecraft {
-    mappings channel: 'official', version: minecraftVersion
-    mappings channel: 'parchment', version: "$parchmentVersion-$minecraftVersion"
-
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+neoForge {
+    version = project.neoforgeVersion
+    validateAccessTransformers = true
 
     runs {
-        client {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'biggerstacks'
-
-            args(["--username", "Dev###"])
-
-            mods {
-
-                biggerstacks {
-                    source sourceSets.main
-                }
-            }
-        }
-
+        client { client() }
         server {
-            workingDirectory project.file('serverrun')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'biggerstacks'
-
-            mods {
-                biggerstacks {
-                    source sourceSets.main
-                }
-            }
+            server()
+            programArguments.addAll '--nogui'
         }
+        data { data() }
+        gameTestServer { type = "gameTestServer" }
+    }
 
-        gameTestServer {
-            workingDirectory project.file('gametestrun')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'biggerstacks'
-
-            mods {
-                biggerstacks {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('datarun')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            args '--mod', 'biggerstacks', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-
-            mods {
-                biggerstacks {
-                    source sourceSets.main
-                }
-            }
+    mods {
+        biggerstacks {
+            sourceSet sourceSets.main
         }
     }
 }
-
-mixin {
-    add sourceSets.main, "biggerstacks.refmap.json"
-
-    config "biggerstacks.mixins.json"
-}
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     mavenCentral()
-    mavenLocal()
 
-    maven { // JEI
-        name 'DVS1 Maven FS'
-        url 'https://dvs1.progwml6.com/files/maven'
-    }
-    maven {
-        url = "https://codeberg.org/api/packages/PORTB/maven"
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
-            }
-        }
-        forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
-        filter {
-            includeGroup "maven.modrinth"
-        }
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                url "https://cursemaven.com"
-            }
-        }
-        forRepositories(fg.repository)
-        filter {
-            includeGroup "curse.maven"
-        }
-    }
-
+    // Vendored PORTB libraries. Upstream publishes these to https://codeberg.org/api/packages/PORTB/maven,
+    // which cannot be downloaded anonymously, so the exact artifacts are extracted from the upstream
+    // 1.20.1 release jar (META-INF/jarjar/) and kept in libs/maven.
+    maven { url = uri("libs/maven") }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:$minecraftVersion-$forgeVersion"
+    implementation 'portb:BiggerStacksConfigLib:2026.02.25'
+    implementation 'portb:SimpleLoggerWrapper:1.0'
 
-    //
-    // Embedded libraries
-    //
-    jarJar.enable()
-    project.configurations.minecraftLibrary.extendsFrom(project.configurations.jarJar)
-
-    jarJar "portb:BiggerStacksConfigLib:$configLibVersion",
-            "portb:BiggerStacksTransformerLib:$transformerLibVersion",
-            "portb:SimpleLoggerWrapper:$simpleLoggerWrapperVersion"
-
-    jarJar("com.thoughtworks.xstream:xstream:[1.4.21]") {
-        //we do not want xstream's built in parser. We will use stax.
+    implementation('com.thoughtworks.xstream:xstream:1.4.21') {
+        // The XML parser is not used, BiggerStacksConfigLib configures the STAX driver
         exclude group: 'io.github.x-stream', module: 'mxparser'
     }
-
-    //
-    // Mods with compat modules
-    //
-    implementation fg.deobf("maven.modrinth:ae2:15.4.10")
-    implementation fg.deobf("maven.modrinth:guideme:20.1.14")
-    implementation fg.deobf("maven.modrinth:refined-storage:1.12.4")
-    implementation fg.deobf("maven.modrinth:sophisticated-backpacks:1.20.1-3.24.56.1903")
-    implementation fg.deobf("maven.modrinth:sophisticated-core:1.20.1-1.3.54.2027")
-    implementation fg.deobf("maven.modrinth:modular-routers:12.1.1")
-    implementation fg.deobf("maven.modrinth:betterbundles:1.20.1-1.1.0")
-
-    //
-    // Testing
-    //
-
-    //
-    // Mixin
-    //
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-
-    runtimeOnly fg.deobf("portb:unifiedoptions:1.20.1-1.1")
 }
 
-jar {
-    manifest {
-        attributes([
-                "Specification-Title"        : "biggerstacks",
-                "Implementation-Title"       : project.name,
-                "Implementation-Version"     : project.jar.archiveVersion.get(),
-                "Implementation-Timestamp"   : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "TransformerLib-Version"     : transformerLibVersion,
-                "ConfigLib-Version"          : configLibVersion,
-                "SimpleLoggerWrapper-Version": simpleLoggerWrapperVersion
-        ])
+def modFullVersion = version.toString()
+
+processResources {
+    inputs.property 'version', modFullVersion
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand 'version': modFullVersion
     }
-}
-
-jar.finalizedBy('reobfJar')
-
-reobf {
-    jarJar {}
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    options.encoding = 'UTF-8'
+    options.release = 21
 }
 
-modrinth {
-    if(project.hasProperty("MODRINTH_TOKEN"))
-        token = MODRINTH_TOKEN
-    projectId = modrinthProjectId
-    versionNumber = "${project.archivesBaseName}-${project.version}"
-    uploadFile = tasks.jarJar.outputs.files.getSingleFile()
-    gameVersions = [minecraftVersion]
-    loaders = ["forge"]
+tasks.withType(Javadoc).configureEach {
+    options.encoding = "UTF-8"
 }

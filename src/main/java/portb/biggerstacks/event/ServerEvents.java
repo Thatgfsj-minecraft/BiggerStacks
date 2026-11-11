@@ -7,19 +7,19 @@
 
 package portb.biggerstacks.event;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import portb.biggerstacks.Constants;
 
-@Mod.EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.DEDICATED_SERVER)
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public class ServerEvents
 {
     private static ServerLifecycleHandler handler;
-
+    
     /**
      * Creates a ServerLifecycleHandler that manages config updates
      */
@@ -27,19 +27,19 @@ public class ServerEvents
     public static void serverStarting(ServerAboutToStartEvent event)
     {
         handler = new ServerLifecycleHandler();
-
-        MinecraftForge.EVENT_BUS.register(handler);
+        
+        NeoForge.EVENT_BUS.register(handler);
     }
-
+    
     /**
      * Unregisters the handler
      */
     @SubscribeEvent
     public static void serverStopping(ServerStoppingEvent event)
     {
-        MinecraftForge.EVENT_BUS.unregister(handler);
-
+        NeoForge.EVENT_BUS.unregister(handler);
+        
         handler.ensureStopped();
     }
-
+    
 }

@@ -8,69 +8,72 @@
 package portb.biggerstacks.net;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import portb.biggerstacks.Constants;
+import portb.biggerstacks.config.StackSizeRules;
 import portb.configlib.template.ConfigTemplate;
-import portb.configlib.xml.*;
+import portb.configlib.xml.Condition;
+import portb.configlib.xml.Operator;
+import portb.configlib.xml.OrBlock;
+import portb.configlib.xml.Property;
+import portb.configlib.xml.Rule;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.function.Supplier;
 
-public class ServerboundCreateConfigTemplatePacket extends GenericTemplateOptionsPacket
+public class ServerboundCreateConfigTemplatePacket extends GenericTemplateOptionsPacket implements CustomPacketPayload
 {
+    public static final Type<ServerboundCreateConfigTemplatePacket>                                 TYPE         = new Type<>(
+            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "create_template"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundCreateConfigTemplatePacket> STREAM_CODEC = StreamCodec.of(
+            ServerboundCreateConfigTemplatePacket::write,
+            ServerboundCreateConfigTemplatePacket::read);
+    
     public ServerboundCreateConfigTemplatePacket(int normalStackLimit, int potionsStackLimit, int enchantedBooksStackLimit)
     {
         super(normalStackLimit, potionsStackLimit, enchantedBooksStackLimit);
     }
-
-    public ServerboundCreateConfigTemplatePacket(FriendlyByteBuf buf)
+    
+    public ServerboundCreateConfigTemplatePacket(RegistryFriendlyByteBuf buf)
     {
         super(buf);
     }
-
-    static void handleCreateConfigTemplate(ServerboundCreateConfigTemplatePacket serverboundCreateConfigTemplatePacket, Supplier<NetworkEvent.Context> contextSupplier)
+    
+    private static ServerboundCreateConfigTemplatePacket read(RegistryFriendlyByteBuf buf)
+    {
+        return new ServerboundCreateConfigTemplatePacket(buf);
+    }
+    
+    private static void write(RegistryFriendlyByteBuf buf, ServerboundCreateConfigTemplatePacket packet)
+    {
+        packet.encode(buf);
+    }
+    
+    static void handleCreateConfigTemplate(ServerboundCreateConfigTemplatePacket serverboundCreateConfigTemplatePacket, IPayloadContext context)
     {
         //If on a server, check that the player actually has permissions to do this
-        if (FMLEnvironment.dist.isDedicatedServer())
+        if (FMLEnvironment.getDist().isDedicatedServer())
         {
-            ServerPlayer sender = contextSupplier.get().getSender();
-
-            if (sender == null || !sender.hasPermissions(Constants.CHANGE_STACK_SIZE_COMMAND_PERMISSION_LEVEL))
-            {
+            if (!(context.player() instanceof ServerPlayer sender) ||
+                        !sender.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_OWNER))
                 return;
-            }
         }
-
+        
         ConfigTemplate template = ConfigTemplate.generateTemplate(serverboundCreateConfigTemplatePacket);
-
-        if (ModList.get().isLoaded("ic2"))
-        {
-            //limit ic2 upgrades to 64 (if it is installed), or issues might occur with putting too many into machines
-            template.getRules().add(new Rule(Arrays.asList(
-                            new Condition(Property.MOD_ID, Operator.EQUALS, "ic2"),
-                            new OrBlock(
-                                    Arrays.asList(
-                                            new Condition(Property.ID, Operator.STRING_STARTS_WITH, "ic2:upgrade"),
-                                            new Condition(Property.ID, Operator.STRING_ENDS_WITH, "pad_upgrade"),
-                                            new Condition(Property.ID, Operator.STRING_ENDS_WITH, "upgrade_kit")
-                                    )
-                            )
-                    ), 64)
-            );
-        }
-
+        
         try
         {
             Files.writeString(Constants.RULESET_FILE,
-                    template.toXML(),
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING
+                              template.toXML(),
+                              StandardOpenOption.CREATE,
+                              StandardOpenOption.TRUNCATE_EXISTING
             );
         }
         catch (IOException e)
@@ -78,9 +81,15 @@ public class ServerboundCreateConfigTemplatePacket extends GenericTemplateOption
             throw new RuntimeException(e);
         }
     }
-
+    
     public void encode(FriendlyByteBuf buf)
     {
         super.encode(buf);
+    }
+    
+    @Override
+    public Type<ServerboundCreateConfigTemplatePacket> type()
+    {
+        return TYPE;
     }
 }

@@ -8,62 +8,46 @@
 package portb.biggerstacks;
 
 import com.mojang.logging.LogUtils;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import portb.biggerstacks.config.ClientConfig;
 import portb.biggerstacks.config.ServerConfig;
-import portb.biggerstacks.event.ClientEvents;
-import portb.biggerstacks.event.CommonForgeEvents;
-import portb.biggerstacks.event.CommonModEvents;
-import portb.biggerstacks.event.ServerEvents;
 import portb.configlib.ConfigLib;
 import portb.configlib.IMCAPI;
 import portb.slw.MyLoggerFactory;
 
-// The value here should match an entry in the META-INF/mods.toml file
 @Mod(Constants.MOD_ID)
 public class BiggerStacks
 {
     public final static Logger LOGGER = LogUtils.getLogger();
 
-    public BiggerStacks()
+    public BiggerStacks(IEventBus modEventBus, ModContainer modContainer)
     {
-        if (FMLEnvironment.dist.isClient())
-        {
-            MinecraftForge.EVENT_BUS.register(ClientEvents.class);
-        }
-
-        MinecraftForge.EVENT_BUS.register(ServerEvents.class);
-        MinecraftForge.EVENT_BUS.register(CommonModEvents.class);
-        MinecraftForge.EVENT_BUS.register(CommonForgeEvents.class);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
+        modEventBus.addListener(this::processIMC);
 
         ConfigLib.LOGGER = MyLoggerFactory.createMyLogger(LoggerFactory.getLogger(ConfigLib.class));
 
-        registerConfigs();
+        registerConfigs(modContainer);
     }
 
-    private static void registerConfigs()
+    private static void registerConfigs(ModContainer modContainer)
     {
-        ModLoadingContext context = ModLoadingContext.get();
-
-        if (FMLEnvironment.dist.isClient())
+        if (FMLEnvironment.getDist().isClient())
         {
-            context.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, Constants.MOD_ID + "-client.toml");
-            context.registerConfig(ModConfig.Type.CLIENT,
+            modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, Constants.MOD_ID + "-client.toml");
+            modContainer.registerConfig(ModConfig.Type.CLIENT,
                     ServerConfig.LOCAL_INSTANCE.SPEC,
                     Constants.MOD_ID + "-local.toml"
             );
         }
 
-        context.registerConfig(ModConfig.Type.SERVER,
+        modContainer.registerConfig(ModConfig.Type.SERVER,
                 ServerConfig.SERVER_INSTANCE.SPEC,
                 Constants.MOD_ID + "-server.toml"
         );

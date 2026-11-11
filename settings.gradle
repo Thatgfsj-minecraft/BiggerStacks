@@ -8,10 +8,12 @@
 pluginManagement {
     repositories {
         maven {
-            url = "https://codeberg.org/api/packages/PORTB/maven"
+            name = "NeoForged"
+            url = "https://maven.neoforged.net/releases"
         }
+        mavenCentral()
         gradlePluginPortal()
     }
 }
 
-rootProject.name = "BiggerStacks-$minecraftVersion"
+rootProject.name = "biggerstacks-1.21.11"

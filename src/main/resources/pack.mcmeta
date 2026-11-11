@@ -1,6 +1,10 @@
 {
   "pack": {
     "description": "BiggerStacks resources",
-    "pack_format": 8
+    "pack_format": 75,
+    "supported_formats": [
+      75,
+      81
+    ]
   }
 }

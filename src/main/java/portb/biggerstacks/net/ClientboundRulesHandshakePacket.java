@@ -8,40 +8,42 @@
 package portb.biggerstacks.net;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import portb.biggerstacks.Constants;
 import portb.biggerstacks.config.StackSizeRules;
 import portb.configlib.xml.RuleSet;
 
 /**
- * Packet sent to clients in login handshake to ensure that the client gets stack size rules before they are needed
+ * Packet sent to clients in login handshake to ensure that the client gets stack size rules before they are needed.
  */
-public class ClientboundRulesHandshakePacket
+public record ClientboundRulesHandshakePacket(RuleSet rules) implements CustomPacketPayload
 {
-    private final RuleSet rules;
-
-    /**
-     * Decodes a packet from a byte buffer
-     */
-    public ClientboundRulesHandshakePacket(FriendlyByteBuf buf)
+    public static final Type<ClientboundRulesHandshakePacket>                             TYPE         = new Type<>(
+            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "rules_handshake"));
+    public static final StreamCodec<FriendlyByteBuf, ClientboundRulesHandshakePacket>     STREAM_CODEC = StreamCodec.of(
+            ClientboundRulesHandshakePacket::write,
+            ClientboundRulesHandshakePacket::read);
+    
+    private static ClientboundRulesHandshakePacket read(FriendlyByteBuf buf)
     {
-        rules = RuleSet.fromBytes(buf.readByteArray());
+        return new ClientboundRulesHandshakePacket(RuleSet.fromBytes(buf.readByteArray()));
     }
-
-    /**
-     * Construct a packet which contains the loaded ruleset
-     */
-    @SuppressWarnings("unused")
+    
+    private static void write(FriendlyByteBuf buf, ClientboundRulesHandshakePacket packet)
+    {
+        buf.writeByteArray(packet.rules().toBytes());
+    }
+    
     public ClientboundRulesHandshakePacket()
     {
-        rules = StackSizeRules.getRuleSet();
+        this(StackSizeRules.getRuleSet());
     }
-
-    public void encode(FriendlyByteBuf buf)
+    
+    @Override
+    public Type<ClientboundRulesHandshakePacket> type()
     {
-        buf.writeByteArray(rules.toBytes());
-    }
-
-    public RuleSet getRules()
-    {
-        return rules;
+        return TYPE;
     }
 }

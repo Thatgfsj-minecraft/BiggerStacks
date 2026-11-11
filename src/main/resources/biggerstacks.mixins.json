@@ -2,35 +2,25 @@
   "required": true,
   "minVersion": "0.8",
   "package": "portb.biggerstacks.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_21",
   "plugin": "portb.biggerstacks.TransformerEngine",
-  "refmap": "biggerstacks.refmap.json",
   "mixins": [
-    "compat.ae2.GenericStackInvMixin",
-    "compat.ae2.InternalInventoryMixin",
-    "compat.ae2.IOBusPartMixin",
-    "compat.betterbundles.SizedBundleItemMixin",
-    "compat.modularrouters.CompiledModuleMixin",
-    "compat.modularrouters.ModularRouterBlockEntityMixin",
-    "compat.modularrouters.ModularRoutersStackUpgradeMixin",
-    "compat.refinedstorage.UpgradeItemHandlerMixin",
-    "compat.sophisticatedcore.BaseSlotLimitFixMixin",
     "vanilla.AnvilMenuMixin",
+    "vanilla.ContainerMixin",
     "vanilla.ContainersMixin",
-    "vanilla.FriendlyByteBufMixin",
+    "vanilla.DataComponentsMixin",
+    "vanilla.ExtraCodecsMixin",
     "vanilla.ItemPropertiesMixin",
-    "vanilla.stacksize.BundleItemMixin",
+    "vanilla.stacksize.BundleContentsMutableMixin",
     "vanilla.stacksize.ItemEntityMixin",
     "vanilla.stacksize.ItemMixin",
-    "vanilla.stacksize.ItemStackAccessor",
-    "vanilla.stacksize.ItemStackMixin",
-    "vanilla.stacksize.ServerGamePacketListenerImplMixin"
+    "vanilla.stacksize.ItemStackHandlerMixin",
+    "vanilla.stacksize.ItemStackMixin"
   ],
   "client": [
-    "client.ItemRendererMixin",
-    "compat.ae2.AEBaseScreenMixin"
+    "client.ItemRendererMixin"
   ],
   "injectors": {
-    "defaultRequire": 1
+    "defaultRequire": 0
   }
 }
