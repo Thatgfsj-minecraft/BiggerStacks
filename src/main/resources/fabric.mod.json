@@ -21,17 +21,6 @@
   "mixins": [
     "biggerstacks.mixins.json"
   ],
-  "jars": [
-    {
-      "file": "META-INF/jars/BiggerStacksConfigLib-2026.02.25.jar"
-    },
-    {
-      "file": "META-INF/jars/SimpleLoggerWrapper-1.0.jar"
-    },
-    {
-      "file": "META-INF/jars/xstream-1.4.21.jar"
-    }
-  ],
   "depends": {
     "fabricloader": ">=0.18.0",
     "fabric-api": "*",

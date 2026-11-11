@@ -48,8 +48,9 @@ JAVA_HOME=/path/to/jdk-21 ./gradlew build
    规则集在玩家加入时由服务端直接下发（不再有 configuration 阶段任务）。
 5. **事件**：NeoForge 事件 → Fabric API（`ServerLifecycleEvents`、`ServerPlayConnectionEvents`、`CommandRegistrationCallback`、
    `ClientPlayConnectionEvents`、`ItemTooltipCallback`）。
-6. **依赖打包**：NeoForge 用 jarJar；Fabric 用 `fabric.mod.json` 的 `jars` + `META-INF/jars/`（ConfigLib / SLW / xstream）。
+6. **依赖打包**：NeoForge 用 jarJar；Fabric **把 ConfigLib / SLW / xstream 直接 shade 进 mod jar**。注意 Fabric Loader 只加载“本身是 Fabric 模组”的嵌套 jar，普通库写进 `fabric.mod.json` 的 `jars` 不会进 classpath（已用最小复现模组验证）。
 7. **兼容模块**：1.21.11 的精妙核心/背包、AE2、RS、Modular Routers 都没有 Fabric 构建，因此本分支暂不含兼容模块。
+8. **Mixin 注入方式**：`AnvilMenuMixin` 用 MixinExtras `@WrapOperation` 而不是 `@Redirect`——Mixin 0.8.7 的 `@Redirect.at` 是数组形式，会让 Fabric Loader 0.18.4 内置的 MixinExtras 0.5.0 抛 `ClassCastException`。
 
 ## 已验证
 
@@ -59,6 +60,7 @@ JAVA_HOME=/path/to/jdk-21 ./gradlew build
 - [x] `/biggerstacks info` 返回 1000；`summon ... count:2000` 生成后数据为 2000（大数量 codec 通过）
 - [x] 服务端命令、RCON、保存/停止正常
 - [x] Fabric Loader **0.18.4** 下开发服可加载并到 Done（依赖下限已放宽到 0.18.0）
+- [x] Fabric Loader 0.18.4 + 195 个模组的真实客户端实例：启动到主菜单、进入世界、无崩溃（shade 依赖 + `@WrapOperation` 修复后）
 
 ## 已知待办
 
