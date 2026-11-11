@@ -62,7 +62,7 @@ JAVA_HOME=/path/to/jdk-21 ./gradlew build
 ## 已知待办
 
 - [ ] 客户端 GUI 目检（`/biggerstacks quicksetup`、tooltip 精确数量、物品角标缩写）——无头环境无法验证
-- [ ] 重启后大数量持久化复验（NeoForge 分支已验，Fabric 待补）
+- [x] 重启后大数量持久化复验：count=2000 的实体保存后重启仍为 2000
 - [ ] Fabric 兼容模块（等上游发布 Fabric 1.21.11 构建）
 - [ ] CI（构建阶段启用，#11）与发布方式（#12）
 
