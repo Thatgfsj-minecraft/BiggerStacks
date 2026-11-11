@@ -36,6 +36,14 @@ loom {
     }
 }
 
+configurations {
+    // Libraries shaded into the mod jar. Fabric Loader only loads nested jars that are Fabric mods
+    // themselves; plain library jars are not added to the classpath, so shade them instead.
+    shade
+    compileOnly.extendsFrom shade
+    runtimeOnly.extendsFrom shade
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.officialMojangMappings()
@@ -43,10 +51,12 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
 
-    // Bundled at runtime through src/main/resources/META-INF/jars + fabric.mod.json "jars"
-    implementation 'portb:BiggerStacksConfigLib:2026.02.25'
-    implementation 'portb:SimpleLoggerWrapper:1.0'
-    implementation('com.thoughtworks.xstream:xstream:1.4.21') {
+    // Annotations only, MixinExtras itself is provided by Fabric Loader at runtime
+    compileOnly 'io.github.llamalad7:mixinextras-fabric:0.5.0'
+
+    shade 'portb:BiggerStacksConfigLib:2026.02.25'
+    shade 'portb:SimpleLoggerWrapper:1.0'
+    shade('com.thoughtworks.xstream:xstream:1.4.21') {
         exclude group: 'io.github.x-stream', module: 'mxparser'
     }
 }
@@ -71,4 +81,15 @@ processResources {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.release = 21
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from({ configurations.shade.collect { it.isDirectory() ? it : zipTree(it) } }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+        exclude 'module-info.class'
+        exclude 'META-INF/versions/**'
+    }
 }
