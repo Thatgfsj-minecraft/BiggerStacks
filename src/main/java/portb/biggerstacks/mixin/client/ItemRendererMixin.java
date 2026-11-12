@@ -67,7 +67,7 @@ public abstract class ItemRendererMixin
         pose.pushMatrix();
         pose.translate(x + 17 - scaledWidth, y + 9);
         pose.scale((float) scale, (float) scale);
-        graphics.drawString(font, text, 0, 0, 0xFFFFFF, true);
+        graphics.drawString(font, text, 0, 0, 0xFFFFFFFF, true);
         pose.popMatrix();
 
         ci.cancel();
