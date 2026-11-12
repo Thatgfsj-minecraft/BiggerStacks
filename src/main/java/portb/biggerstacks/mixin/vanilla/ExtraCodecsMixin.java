@@ -10,6 +10,7 @@ package portb.biggerstacks.mixin.vanilla;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -46,9 +47,16 @@ public class ExtraCodecsMixin
 
     private static boolean isBuildingItemStackCodec()
     {
+        // The named class name only exists in a development environment. In production the game runs with
+        // intermediary names (e.g. net.minecraft.class_1799) and the codec is built from a lambda inside
+        // ItemStack's static initializer, so compare against the runtime name of ItemStack and its lambdas.
+        String itemStackClassName = ItemStack.class.getName();
+
         for (StackTraceElement frame : Thread.currentThread().getStackTrace())
         {
-            if ("net.minecraft.world.item.ItemStack".equals(frame.getClassName()))
+            String className = frame.getClassName();
+
+            if (className.equals(itemStackClassName) || className.startsWith(itemStackClassName + "$$Lambda"))
                 return true;
         }
 
