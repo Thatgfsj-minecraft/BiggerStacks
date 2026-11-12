@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 public class ConfigureScreen extends Screen
 {
     private static final int WIDTH  = 220;
-    private static final int HEIGHT = 200;
+    private static final int HEIGHT = 230;
 
     private final TemplateOptions previousOptions;
     private final boolean         isAlreadyUsingCustomFile;
@@ -112,7 +112,7 @@ public class ConfigureScreen extends Screen
         normalItemsBox.setResponder(verifyInputBoxNumber(normalItemsBox));
 
         confirmButton = Button.builder(Component.translatable("biggerstacks.save"), this::onConfirmButtonClicked)
-                .bounds(relX + (WIDTH - 80) / 2, relY + HEIGHT - 30, 80, 20)
+                .bounds(relX + (WIDTH - 80) / 2, relY + HEIGHT - 35, 80, 20)
                 .build();
 
         addRenderableWidget(normalItemsBox);
@@ -128,24 +128,25 @@ public class ConfigureScreen extends Screen
     {
         int relX = (this.width - WIDTH) / 2, relY = (this.height - HEIGHT) / 2;
 
-        graphics.drawCenteredString(font, Component.translatable("biggerstacks.config.title"), width / 2, relY + 10, 0xffffff);
+        graphics.drawCenteredString(font, Component.translatable("biggerstacks.config.title"), width / 2, relY + 10, 0xFFFFFFFF);
 
         int centreOffset = (20 - font.lineHeight) / 2;
         int labelStartX = 20, labelStartY = 30;
 
         graphics.drawString(font, Component.translatable("biggerstacks.normalbox.label"),
-                relX + labelStartX, centreOffset + relY + labelStartY, 0xffffff, false);
+                relX + labelStartX, centreOffset + relY + labelStartY, 0xFFFFFFFF, false);
 
         graphics.drawString(font, Component.translatable("biggerstacks.potsbox.label"),
-                relX + labelStartX, centreOffset + relY + labelStartY + 30, 0xffffff, false);
+                relX + labelStartX, centreOffset + relY + labelStartY + 30, 0xFFFFFFFF, false);
 
         graphics.drawString(font, Component.translatable("biggerstacks.enchbox.label"),
-                relX + labelStartX, centreOffset + relY + labelStartY + 60, 0xffffff, false);
+                relX + labelStartX, centreOffset + relY + labelStartY + 60, 0xFFFFFFFF, false);
 
-        STACK_LIMIT_HINT_LABEL.visitLines(TextAlignment.CENTER, width / 2, relY + 100, 9, graphics.textRenderer());
+        // Keep the hint below the third row of edit boxes (rows are at 30/60/90, boxes are 20 high)
+        STACK_LIMIT_HINT_LABEL.visitLines(TextAlignment.CENTER, width / 2, relY + 120, 9, graphics.textRenderer());
 
         if (isAlreadyUsingCustomFile)
-            OVERWRITE_WARNING_LABEL.visitLines(TextAlignment.CENTER, width / 2, relY + 125, 9, graphics.textRenderer());
+            OVERWRITE_WARNING_LABEL.visitLines(TextAlignment.CENTER, width / 2, relY + 150, 9, graphics.textRenderer());
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }
@@ -213,12 +214,12 @@ public class ConfigureScreen extends Screen
         {
             if (isEditBoxInputValid(inputString))
             {
-                editBox.setTextColor(0xffffff);
+                editBox.setTextColor(0xFFFFFFFF);
                 confirmButton.active = true;
             }
             else
             {
-                editBox.setTextColor(0xff0000);
+                editBox.setTextColor(0xFFFF0000);
                 confirmButton.active = false;
             }
         };
