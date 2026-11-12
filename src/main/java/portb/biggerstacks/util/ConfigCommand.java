@@ -80,9 +80,16 @@ public class ConfigCommand
                     return 1;
                 }));
 
-        //if on a dedicated server, require permissions
-        cmd.requires(commandSourceStack -> !commandSourceStack.getServer().isDedicatedServer()
-                || commandSourceStack.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_OWNER));
+        // If on a dedicated server, require permissions. Some command sources (for example the ones used
+        // to filter the command tree sent to a joining player) have no server attached, so guard against null.
+        cmd.requires(commandSourceStack ->
+        {
+            var server = commandSourceStack.getServer();
+            return server == null
+                    || !server.isDedicatedServer()
+                    || commandSourceStack.permissions().hasPermission(
+                    net.minecraft.server.permissions.Permissions.COMMANDS_OWNER);
+        });
 
         dispatcher.register(cmd);
     }
